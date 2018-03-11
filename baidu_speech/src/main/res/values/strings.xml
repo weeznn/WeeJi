@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Baidu_Speech</string>
+    <string name="speech_et_hint">点击开始录音！</string>
+</resources>
