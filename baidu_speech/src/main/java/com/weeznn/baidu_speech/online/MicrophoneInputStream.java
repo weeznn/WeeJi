@@ -56,6 +56,17 @@ public class MicrophoneInputStream extends InputStream {
         audioRecord.startRecording();
     }
 
+    public void pause(){
+        Log.i(TAG,"MicrophoneInputStream pause recoading");
+        if (audioRecord!=null&&audioRecord.getState()==AudioRecord.STATE_INITIALIZED){
+            audioRecord.stop();
+            isStarted=false;
+            if (audioRecord==null){
+                Log.i(TAG,"MicrophoneInputStream pause and audioRecord is null");
+            }
+            Log.i(TAG,"MicrophoneInputStream pause and audio state is "+audioRecord.getState());
+        }
+    }
     @Override
     public int read() throws IOException {
         throw new UnsupportedOperationException();
@@ -68,7 +79,7 @@ public class MicrophoneInputStream extends InputStream {
             isStarted = true;
         }
         int count = audioRecord.read(b, off, len);
-        Log.i(TAG, " MicrophoneInputStream read count:" + count);
+        //Log.i(TAG, " MicrophoneInputStream read count:" + count);
         return count;
     }
 

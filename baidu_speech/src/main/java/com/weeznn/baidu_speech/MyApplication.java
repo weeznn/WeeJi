@@ -10,12 +10,17 @@ import android.content.SharedPreferences;
 
 public class MyApplication extends Application {
     private static final String TAG="MyApplication";
-    private static final String APPSHAREDPREFERENCENAME="baidu_appech";
+    //设备信息  屏幕
+    public static  float scale;
+    public static  float scaleDensity;
+
     private static Context context;
     @Override
     public void onCreate() {
         super.onCreate();
         context=getApplicationContext();
+        scale=getContext().getResources().getDisplayMetrics().density;
+        scaleDensity=getContext().getResources().getDisplayMetrics().scaledDensity;
     }
 
     /**

@@ -1,15 +1,21 @@
 package com.weeznn.baidu_speech.activity;
 
 import android.Manifest;
+import android.animation.ObjectAnimator;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
+import android.view.animation.Animation;
 import android.widget.TextView;
 
 
@@ -18,12 +24,12 @@ import com.baidu.speech.EventManager;
 import com.baidu.speech.EventManagerFactory;
 
 import com.baidu.speech.asr.SpeechConstant;
-import com.google.gson.Gson;
 import com.weeznn.baidu_speech.R;
 import com.weeznn.baidu_speech.imp.IStatus;
 import com.weeznn.baidu_speech.online.InFileStream;
 import com.weeznn.baidu_speech.online.MicrophoneInputStream;
 import com.weeznn.baidu_speech.util.FileUtil;
+import com.weeznn.baidu_speech.util.ViewUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,7 +41,13 @@ import java.util.Date;
 
 public class Baidu_ASR extends MainActivity implements IStatus {
     private static final String TAG=Baidu_ASR.class.getSimpleName();
-    private static final String MEETTING_NAME="meetting_name";
+
+    //Voice 的2个状态
+    private static final int VOICE_STATE_REDY=0;
+    private static final int VOICE_STATE_SPEAKING=1;
+    private static final int VOICE_STATE_PAUSE=2;
+    private int voiceState=VOICE_STATE_REDY;
+
     private static  String path="";
     /**
      * 事件管理器，识别事件管理器只能维持一个。不能使用多个实例
@@ -60,11 +72,12 @@ public class Baidu_ASR extends MainActivity implements IStatus {
     private static String[] PERMISSION_RECORD_AUDIO={Manifest.permission.RECORD_AUDIO};
 
     private String meettingName=" ";
-    private Button start;
-    private Button stop;
-    private Button cancel;
+    private FloatingActionButton voice;
+    private FloatingActionButton down;
+    private FloatingActionButton cancel;
     private TextView textView;
-    //private boolean isVoiceEnd=false;//是否在讲话
+    private Toolbar toolbar;
+
     private StringBuilder text=new StringBuilder();
 
 
@@ -73,71 +86,18 @@ public class Baidu_ASR extends MainActivity implements IStatus {
         super.onCreate(savedInstanceState);
         Log.i(TAG,"oncreat");
         setContentView(R.layout.baidu_asr);
-        //super.initPermition();
-
-        microphoneInputStream= MicrophoneInputStream.getInstance();
-       InFileStream.setInputStream(microphoneInputStream);
-
 
         // TODO: 2018/3/10  把会议名字放好
+        meettingName="会议名字";
         //meettingName=getIntent().getStringExtra(Baidu_ASR.MEETTING_NAME);
 
+
         path= Environment.getExternalStorageDirectory().toString() + "/"+AppName+"/meetting/";
-        //初始化
+
+        //ASR初始化
         eventManager= EventManagerFactory.create(Baidu_ASR.this,"asr");
         //注册自己的输出事件
-        listener=new EventListener() {
-            @Override
-            public void onEvent(String s, String s1, byte[] bytes, int i, int i1) {
-                switch (s){
-                    case SpeechConstant.CALLBACK_EVENT_ASR_READY:
-                        //引擎准备就绪，可以开始说话
-                        Log.i(TAG,Thread.currentThread().getId()+"回调  引擎准备好");
-                        break;
-                    case SpeechConstant.CALLBACK_EVENT_ASR_FINISH:
-                        //识别结果
-                        Log.i(TAG,Thread.currentThread().getId()+"回调  识别结果finish  "+s1);
-
-                        break;
-                    case SpeechConstant.CALLBACK_EVENT_ASR_BEGIN:
-                        //检测到说话开始
-                        Log.i(TAG,Thread.currentThread().getId()+"回调  说话开始"+s1);
-
-                        break;
-                    case SpeechConstant.CALLBACK_EVENT_ASR_END:
-                        //检测到说话结束
-
-
-                        break;
-                    case SpeechConstant.CALLBACK_EVENT_ASR_PARTIAL:
-                        //识别结果
-                        Log.i(TAG,Thread.currentThread().getId()+"回调  partical "+ s1);
-
-
-                            try {
-                                JSONObject jsonObject=new JSONObject(s1);
-                                if (jsonObject.getString("result_type").equals("final_result")){
-                                    text.append(jsonObject.getString("best_result"));
-                                    textView.setText(text.toString());
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-
-                        break;
-                    case SpeechConstant.CALLBACK_EVENT_ASR_VOLUME:
-                        //音量回调
-                        Log.i(TAG,Thread.currentThread().getId()+"回调  音量回调 "+ s1);
-                        break;
-                    case SpeechConstant.CALLBACK_EVENT_ASR_AUDIO:
-                        //语音音频数据回调
-                        break;
-                    case SpeechConstant.CALLBACK_EVENT_ASR_EXIT:
-                        //识别结束，资源释放--开始另外一次回调？
-                        break;
-                }
-            }
-        };
+        listener=new MyEventListener();
         eventManager.registerListener(listener);
 
         //以下为界面
@@ -149,59 +109,95 @@ public class Baidu_ASR extends MainActivity implements IStatus {
         super.onPause();
 
         eventManager.unregisterListener(listener);
-        try {
-            microphoneInputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (microphoneInputStream!=null){
+            try {
+                microphoneInputStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
     }
 
     private void initView(){
-        start=findViewById(R.id.start);
-        stop=findViewById(R.id.stop);
-        cancel=findViewById(R.id.cancel);
-        textView=findViewById(R.id.text);
-
-        start.setOnClickListener(new View.OnClickListener() {
+        //Toolbar
+        toolbar=findViewById(R.id.toolbar);
+        if (meettingName==null||meettingName.equals(" ")){
+            toolbar.setTitle("未命名的会议");
+        }else {
+            toolbar.setTitle(meettingName);
+        }
+        setSupportActionBar(toolbar);
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
-            public void onClick(View v) {
-                Log.i(TAG,"onclick  start");
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.nlu:
+                        // TODO: 2018/3/11 显示语义分析结果
+                        break;
+                }
+                return true;
+            }
+        });
+
+        //FAB Voice
+        MyClickListener myClickListener=new MyClickListener();
+        voice=findViewById(R.id.voice);
+        voice.setOnClickListener(myClickListener);
+        down=findViewById(R.id.down);
+        down.setOnClickListener(myClickListener);
+        cancel=findViewById(R.id.cance);
+        cancel.setOnClickListener(myClickListener);
+        cancel.setVisibility(View.GONE);
+        down.setVisibility(View.GONE);
+
+        //TextView
+        textView=findViewById(R.id.text);
+        //textView.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+        //textView.setTextSize(getSharedPreferences(AppName,0).getFloat("_text_size", ViewUtil.sp2px(16,ViewUtil.CHINESE)));
+
+    }
+
+    /**
+     * 更新FABView
+     */
+    private void updateFABView() {
+        switch (voiceState){
+            case VOICE_STATE_SPEAKING:
+                //说话中  要求暂停
+                cancel.setVisibility(View.VISIBLE);
+                down.setVisibility(View.VISIBLE);
+                voiceState=VOICE_STATE_PAUSE;
+                microphoneInputStream.pause();
+                break;
+            case VOICE_STATE_PAUSE:
+                //暂停中  要求继续
+                cancel.setVisibility(View.GONE);
+                down.setVisibility(View.GONE);
+                voiceState=VOICE_STATE_SPEAKING;
+                microphoneInputStream.start();
+                break;
+            case VOICE_STATE_REDY:
+                //初始状态
+
                 if (PackageManager.PERMISSION_GRANTED!=ActivityCompat.checkSelfPermission(Baidu_ASR.this,PERMISSION_RECORD_AUDIO[0])){
                     ActivityCompat.requestPermissions(Baidu_ASR.this,PERMISSION_RECORD_AUDIO,PERMISSION_REQUEST_CODE);
                 }
-                SharedPreferences sp= PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                SharedPreferences sp= getSharedPreferences(AppName,0);
                 String json=asrReady(sp);
-
+                microphoneInputStream= MicrophoneInputStream.getInstance();
+                InFileStream.setInputStream(microphoneInputStream);
                 microphoneInputStream.start();
                 eventManager.send(SpeechConstant.ASR_START,json,null,0,0);
-            }
-        });
-        stop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i(TAG,"onclick  stop");
-                eventManager.send(SpeechConstant.ASR_STOP,"{}",null,0,0);
-                try {
-                    Log.i(TAG,"reset microphone 资源");
-                    microphoneInputStream.reset();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.i(TAG,"onclick  cancel");
-                eventManager.send(SpeechConstant.ASR_CANCEL,"{}",null,0,0);
-                try {
-                    Log.i(TAG,"close microphone 资源");
-                    microphoneInputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+                voiceState=VOICE_STATE_SPEAKING;
+                break;
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_baidu_asr,menu);
+        return true;
     }
 
     private String asrReady(SharedPreferences sp) {
@@ -257,7 +253,7 @@ public class Baidu_ASR extends MainActivity implements IStatus {
         if (meettingName.equals(" ")){
             builder.append("_未命名会议");
         }else {
-            builder.append(meettingName);
+            builder.append("_"+meettingName);
         }
 
         int permmition= ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
@@ -275,5 +271,81 @@ public class Baidu_ASR extends MainActivity implements IStatus {
         return file.getAbsolutePath();
     }
 
+    /**
+     * SDK事件回调类
+     */
+    private class MyEventListener implements EventListener {
+        @Override
+        public void onEvent(String s, String s1, byte[] bytes, int i, int i1) {
+            switch (s){
+                case SpeechConstant.CALLBACK_EVENT_ASR_READY:
+                    //引擎准备就绪，可以开始说话
+                    Log.i(TAG,Thread.currentThread().getId()+"回调  引擎准备好");
 
+                    break;
+                case SpeechConstant.CALLBACK_EVENT_ASR_FINISH:
+                    //识别结果
+                    Log.i(TAG,Thread.currentThread().getId()+"回调  识别结果finish  "+s1);
+
+                    break;
+                case SpeechConstant.CALLBACK_EVENT_ASR_BEGIN:
+                    //检测到说话开始
+                    Log.i(TAG,Thread.currentThread().getId()+"回调  说话开始"+s1);
+
+                    break;
+                case SpeechConstant.CALLBACK_EVENT_ASR_END:
+                    //检测到说话结束
+                    Log.i(TAG,Thread.currentThread().getId()+"回调  说话结束"+s1);
+                    break;
+                case SpeechConstant.CALLBACK_EVENT_ASR_PARTIAL:
+                    //识别结果
+                    Log.i(TAG,Thread.currentThread().getId()+"回调  partical "+ s1);
+                    JSONObject jsonObject= null;
+                    try {
+                        jsonObject = new JSONObject(s1);
+                        if (jsonObject.getString("result_type").equals("final_result")) {
+                            text.append(jsonObject.getString("best_result"));
+                            Log.i(TAG,"text :"+text.toString());
+                            textView.setText(text.toString());
+                        }
+                    } catch (JSONException e) {
+                        Log.i(TAG,"new jsonObject ERROR");
+                        e.printStackTrace();
+                    }
+
+                    break;
+                case SpeechConstant.CALLBACK_EVENT_ASR_VOLUME:
+                    //音量回调
+                    //Log.i(TAG,Thread.currentThread().getId()+"回调  音量回调 "+ s1);
+                    break;
+                case SpeechConstant.CALLBACK_EVENT_ASR_AUDIO:
+                    //语音音频数据回调
+                    break;
+                case SpeechConstant.CALLBACK_EVENT_ASR_EXIT:
+                    //识别结束，资源释放--开始另外一次回调？
+
+                    break;
+            }
+        }
+    }
+
+    private class MyClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()){
+                case R.id.voice:
+                    //开始和暂停的功能
+                    updateFABView();
+                    break;
+                case R.id.cance:
+                    //取消本次录音，将文件清除
+                    eventManager.send(SpeechConstant.ASR_CANCEL,"{}",null,0,0);
+                    break;
+                case R.id.down:
+                    //已经完成录音，发送停止事件
+                    eventManager.send(SpeechConstant.ASR_STOP,"{}",null,0,0);
+                    break;
+            }
+        }
+    }
 }
