@@ -1,3 +1,104 @@
 <resources>
-    <string name="app_name">weeji</string>
+    <string name="app_name">WeeJi</string>
+    <string name="SharedPreferences_name">com.weeznn.weeji_preferences</string>
+
+    <string name="perference_baidu_title">百度语音参数设置</string>
+    <string name="perference_baidu_language_title">语言</string>
+    <string name="perf_language_defaul_value">1537</string>
+    <string-array name="baidu_language">
+        <item>中文普通话</item>
+        <item>中文四川话</item>
+        <item>粤语</item>
+        <item>英语</item>
+        <item>远场模型</item>
+    </string-array>
+
+    <string-array name="baidu_language_code">
+        <item>1537</item>
+        <item>1837</item>
+        <item>1637</item>
+        <item>1737</item>
+        <item>1936</item>
+    </string-array>
+    <string name="perference_baidu_audio_title">保存录音文件</string>
+    <string name="perference_baidu_audio_sum">将会识别过程中的录音文件保存到本地</string>
+    <string name="perference_baidu_anim_title">音频动画</string>
+    <string name="perference_baidu_anim_sum">将会识别过程中的使用频谱动画！会消耗一定CPU和电量！</string>
+    <string name="perference_baidu_prop_title">垂直领域</string>
+    <string name="perference_baidu_prop_sum">选择您的领域可略微提高识别率！具体效果以实际测试为准！</string>
+    <string name="perf_porp_defaul_value">10005</string>
+    <string-array name="perference_baidu_prop">
+        <item>热词</item>
+        <item>地图</item>
+        <item>音乐</item>
+        <item>视频</item>
+        <item>应用</item>
+        <item>网页</item>
+        <item>购物</item>
+        <item>健康</item>
+        <item>电话</item>
+        <item>医疗</item>
+        <item>汽车</item>
+        <item>娱乐餐饮</item>
+        <item>财经</item>
+        <item>游戏</item>
+        <item>菜谱</item>
+        <item>助手</item>
+        <item>输入</item>
+    </string-array>
+    <string-array name="perference_baidu_prop_code">
+        <item>10005</item>
+        <item>10060</item>
+        <item>10001</item>
+        <item>10002</item>
+        <item>10003</item>
+        <item>10004</item>
+        <item>10006</item>
+        <item>10007</item>
+        <item>10008</item>
+        <item>10052</item>
+        <item>10053</item>
+        <item>10054</item>
+        <item>10055</item>
+        <item>10056</item>
+        <item>10057</item>
+        <item>10058</item>
+        <item>20000</item>
+    </string-array>
+    <string name="perference_baidu_ring_title">提示音</string>
+    <string name="perference_baidu_ring_sum">开启后，软件将会在说话开始|结束、识别成功|出错|取消时播放提示音</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <string name="pref_baidu_language">_language</string>
+    <string name="pref_baidu_prop">_porp</string>
+    <string name="pref_baidu_anim">_anim</string>
+    <string name="pref_baidu_audio">_audio</string>
+    <string name="pref_baidu_ring">_ring</string>
+
+    //主页面侧边栏
+    <string name="nav_skill_title">功能</string>
+    <string name="nav_skill_premery">最近</string>
+    <string name="nav_skill_collection">收藏</string>
+    <string name="nav_skill_meeting">会议</string>
+    <string name="nav_skill_diary">日记</string>
+    <string name="nav_skill_note">笔记</string>
+    <string name="nav_setting">设置</string>
+    <string-array name="toolbar_title">
+        <item>最近</item>
+        <item>收藏</item>
+        <item>会议</item>
+        <item>日记</item>
+        <item>笔记</item>
+        <item>设置</item>
+    </string-array>
+    <string name="nav_open">打开</string>
+    <string name="nav_close">关闭</string>
+
+    <string name="_appColor">_AppColor</string>
+    <string name="_listFragment">最近</string>
+    <string name="_listFragmentTitle">最近</string>
+
+    //alertDialog
+    <string name="dialog_postive">确定</string>
+    <string name="dialog_nagitive">取消</string>
 </resources>

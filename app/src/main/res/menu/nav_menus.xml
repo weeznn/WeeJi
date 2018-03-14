@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group>
+        <item
+            android:icon="@drawable/ic_collection"
+            android:id="@+id/nav_menu_collection"
+            android:title="@string/nav_skill_collection"/>
+        <item
+            android:id="@+id/nav_menu_meeting"
+            android:icon="@drawable/ic_meeting"
+            android:title="@string/nav_skill_meeting"/>
+        <item android:id="@+id/nav_menu_dairy"
+            android:icon="@drawable/ic_diary"
+            android:title="@string/nav_skill_diary"/>
+        <item android:id="@+id/nav_menu_note"
+            android:icon="@drawable/ic_note"
+            android:title="@string/nav_skill_note"/>
+    </group>
+
+    <item
+        android:id="@+id/nav_seeting"
+        android:icon="@drawable/ic_setting"
+        android:title="@string/nav_setting"/>
+</menu>

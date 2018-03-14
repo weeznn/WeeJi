@@ -1,6 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorPrimary">#03A9F4</color>
+    <color name="colorPrimaryDark">#01579B</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="colorWright">#FFFFFF</color>
+
+    <color name="colorRed">#F44336</color>
+    <color name="colorRedDark">#B71C1C</color>
+
+    <color name="colorPink">#E91E63</color>
+    <color name="colorPinkDark">#880E4F</color>
+
+    <color name="colorPurple">#9C27B0</color>
+    <color name="colorPurpleDark">#4A148C</color>
+
+    <color name="colorDeepPurple">#673AB7</color>
+    <color name="colorDeepPurpleDark">#311B92</color>
+
+    <color name="colorIndigo">#3F51B5</color>
+    <color name="colorIndigoDark">#1A237E</color>
+
+    <color name="colorBlue">#2196F3</color>
+    <color name="colorBlueDark">#0D47A1</color>
+
+    <color name="colorLightBlue">#03A9F4</color>
+    <color name="colorLightBlueDark">#01579B</color>
+
+    <color name="colorCyan">#00BCD4</color>
+    <color name="colorCyanDark">#006064</color>
+
+    <color name="colorTeal">#009688</color>
+    <color name="colorTealDark">#004D40</color>
+
+    <color name="colorGreen">#4CAF50</color>
+    <color name="colorGreenDark">#1B5E20</color>
+
+    <color name="colorLightGreen">#8BC34A</color>
+    <color name="colorLightGreenDark">#33691E</color>
+
+    <color name="colorLime">#CDDC39</color>
+    <color name="colorLimeDark">#827717</color>
+
+    <color name="colorYellow">#FFEB3B</color>
+    <color name="colorYellowDark">#F57F17</color>
+
+    <color name="colorAmber">#FFC107</color>
+    <color name="colorAmberDark">#FF6F00</color>
+
+    <color name="colorOrange">#FF9800</color>
+    <color name="colorOrangeDark">#E65100</color>
+
+    <color name="colorDeepOrange">#FF5722</color>
+    <color name="colorDeepOrangeDark">#BF360C</color>
+
+    <color name="colorBrown">#795548</color>
+    <color name="colorBrownDark">#3E2723</color>
+
+    <color name="colorGrey">#9E9E9E</color>
+    <color name="colorGreyDark">#212121</color>
+
+    <color name="colorBlueGrey">#607D8B</color>
+    <color name="colorBlueGreyDark">#263238</color>
 </resources>

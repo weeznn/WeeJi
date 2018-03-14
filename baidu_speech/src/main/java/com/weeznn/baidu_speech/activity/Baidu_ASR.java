@@ -1,21 +1,17 @@
 package com.weeznn.baidu_speech.activity;
 
 import android.Manifest;
-import android.animation.ObjectAnimator;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
 import android.widget.TextView;
 
 
@@ -29,7 +25,6 @@ import com.weeznn.baidu_speech.imp.IStatus;
 import com.weeznn.baidu_speech.online.InFileStream;
 import com.weeznn.baidu_speech.online.MicrophoneInputStream;
 import com.weeznn.baidu_speech.util.FileUtil;
-import com.weeznn.baidu_speech.util.ViewUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,7 +34,7 @@ import java.io.IOException;
 import java.util.Date;
 
 
-public class Baidu_ASR extends MainActivity implements IStatus {
+public class Baidu_ASR extends BaseActivity implements IStatus {
     private static final String TAG=Baidu_ASR.class.getSimpleName();
 
     //Voice 的2个状态
@@ -204,7 +199,7 @@ public class Baidu_ASR extends MainActivity implements IStatus {
         JSONObject jsonObject = new JSONObject();
             //语言
             try {
-                switch (sp.getInt(LANGEWAGE,5)){
+                switch (sp.getString(LANGEWAGE,LANGEWAGE_PUTONGHUA)){
                     case LANGEWAGE_YUEYU:
                         jsonObject.put(SpeechConstant.PID,"1637");
                         break;

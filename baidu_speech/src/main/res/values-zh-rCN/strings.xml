@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Baidu_Speech</string>
+
+    <string name="permission_title">权限申明</string>
+    <string name="permission_message">「WeeJi」的正常使用需要获取网络、磁盘、麦克风等权限！</string>
+
 </resources>
