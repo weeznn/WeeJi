@@ -102,6 +102,7 @@ public class BaiduAsr implements CONS {
         if (eventManager!=null&&listener!=null){
             eventManager.send(SpeechConstant.ASR_CANCEL,"{}",null,0,0);
             eventManager.unregisterListener(listener);
+            // TODO: 2018/3/30  清除数据
         }else {
             throw new RuntimeException("EventManager or EventListener is null");
         }
@@ -114,6 +115,7 @@ public class BaiduAsr implements CONS {
     public void down(){
         if (eventManager!=null){
             eventManager.send(SpeechConstant.ASR_STOP,"{}",null,0,0);
+            // TODO: 2018/3/30 将文本保存 
         }else {
             throw new RuntimeException("EventManager or EventListener is null");
         }

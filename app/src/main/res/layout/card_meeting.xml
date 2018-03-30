@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardCornerRadius="2dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/colorWright">
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="24dp"
+            android:layout_alignParentStart="true"
+            android:text="@string/app_name"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/subtext"
+           android:layout_below="@+id/title"
+            android:layout_width="368dp"
+            android:layout_height="wrap_content"
+            android:lines="3"
+            android:padding="16dp"
+            android:textSize="14sp"
+            android:text="@string/about_app"
+            android:lineSpacingExtra="10dp" />
+
+        <TextView
+            android:id="@+id/key_word_1"
+            android:layout_below="@id/subtext"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:text="会议记事"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="32dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/key_word"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/key_word_2"
+            android:layout_below="@id/subtext"
+            android:layout_toRightOf="@id/key_word_1"
+            android:layout_marginLeft="4dp"
+            android:paddingLeft="6dp"
+            android:paddingRight="8dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:text="会议记事"
+            android:background="@drawable/key_word"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:id="@+id/key_word_3"
+            android:layout_below="@id/subtext"
+            android:layout_toRightOf="@+id/key_word_2"
+            android:layout_marginLeft="4dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:text="会议记事"
+            android:background="@drawable/key_word"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+
+</android.support.v7.widget.CardView>

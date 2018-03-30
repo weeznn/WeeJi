@@ -1,8 +1,6 @@
 package com.weeznn.weeji.fragment;
 
-import android.content.ComponentName;
 import android.content.Intent;
-import android.icu.util.ULocale;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -18,12 +16,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.weeznn.weeji.R;
-import com.weeznn.weeji.adpater.MyAdapter;
-
-import java.util.Locale;
+import com.weeznn.weeji.adpater.MettingAdapter;
 
 public class ListFragment extends Fragment {
     private static final String TAG="ListFragment";
@@ -33,7 +28,7 @@ public class ListFragment extends Fragment {
     private RecyclerView recyclerView;
     private SwipeRefreshLayout refreshLayout;
     private FloatingActionButton fab;
-    private MyAdapter myAdapter;
+    private MettingAdapter myAdapter;
     private RecyclerView.LayoutManager layoutManager;
 
 
@@ -57,10 +52,11 @@ public class ListFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent intent=getActivity().getPackageManager()
                         .getLaunchIntentForPackage("com.weeznn.baidu_speech");
                if (intent!=null){
-                   DialogFragment fragment=new DialogFragment();
+                   DialogFragment fragment=new AlterDialogFragment();
                    fragment.show(getActivity().getSupportFragmentManager(),"dialog");
                }else {
                    Toast.makeText(getActivity(),"未安装百度语音服务！",Toast.LENGTH_SHORT);

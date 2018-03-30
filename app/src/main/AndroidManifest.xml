@@ -29,7 +29,7 @@
             android:theme="@style/AppTheme"
             android:label="@string/title_activity_settings"/>
 
-        <activity android:name=".activity.StartActivity"
+        <activity android:name=".fragment.StartFragment"
             android:theme="@style/AppTheme"/>
     </application>
 

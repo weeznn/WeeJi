@@ -45,7 +45,7 @@
         <activity
             android:name=".activity.SettingsActivity"
             android:label="@string/title_activity_settings" />
-        <activity android:name="com.weeznn.weeji.activity.StartActivity"></activity>
+        <activity android:name="com.weeznn.weeji.fragment.StartFragment"></activity>
     </application>
 
 </manifest>

@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">WeeJi</string>
+    <string name="about_app">「WeeJi」是一款捕捉灵感，提供快速记事服务的智能产品。数据同步百度网盘，共享2T超大空间，数据安全有保障、永恒存储不丢失。</string>
     <string name="SharedPreferences_name">com.weeznn.weeji_preferences</string>
+    <string name="isFirst">first</string>
 
     <string name="perference_baidu_title">百度语音参数设置</string>
     <string name="perference_baidu_language_title">语言</string>
@@ -101,4 +103,13 @@
     //alertDialog
     <string name="dialog_postive">确定</string>
     <string name="dialog_nagitive">取消</string>
+
+    <string-array name="mood">
+        <item>^_^</item>
+        <item>T_T</item>
+        <item>-_-</item>
+        <item>O_O</item>
+        <item>^0^</item>
+        <item>:/</item>
+    </string-array>
 </resources>
