@@ -34,9 +34,11 @@ public class Meeting {
         this.address = address;
         this.modetator = modetator;
     }
+
     @Generated(hash = 171861101)
     public Meeting() {
     }
+
     public long get_metID() {
         return this._metID;
     }

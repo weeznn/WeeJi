@@ -71,22 +71,20 @@
     <string name="perference_baidu_ring_sum">开启后，软件将会在说话开始|结束、识别成功|出错|取消时播放提示音</string>
     <string name="title_activity_settings">Settings</string>
 
-    <string name="pref_baidu_language">_language</string>
-    <string name="pref_baidu_prop">_porp</string>
-    <string name="pref_baidu_anim">_anim</string>
-    <string name="pref_baidu_audio">_audio</string>
-    <string name="pref_baidu_ring">_ring</string>
+    <string name="pref_baidu_language">language</string>
+    <string name="pref_baidu_prop">porp</string>
+    <string name="pref_baidu_anim">anim</string>
+    <string name="pref_baidu_audio">audio</string>
+    <string name="pref_baidu_ring">ring</string>
 
     //主页面侧边栏
     <string name="nav_skill_title">功能</string>
-    <string name="nav_skill_premery">最近</string>
     <string name="nav_skill_collection">收藏</string>
     <string name="nav_skill_meeting">会议</string>
     <string name="nav_skill_diary">日记</string>
     <string name="nav_skill_note">笔记</string>
     <string name="nav_setting">设置</string>
     <string-array name="toolbar_title">
-        <item>最近</item>
         <item>收藏</item>
         <item>会议</item>
         <item>日记</item>
@@ -112,4 +110,7 @@
         <item>^0^</item>
         <item>:/</item>
     </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

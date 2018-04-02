@@ -15,9 +15,9 @@ public class People {
     private String photo;
     private String company;
     private String job;
-    @Generated(hash = 555995750)
+    @Generated(hash = 171753250)
     public People(String phone, String name, String email, String photo,
-                  String company, String job) {
+            String company, String job) {
         this.phone = phone;
         this.name = name;
         this.email = email;
@@ -25,9 +25,11 @@ public class People {
         this.company = company;
         this.job = job;
     }
-    @Generated(hash = 1277389469)
+
+    @Generated(hash = 1406030881)
     public People() {
     }
+
     public String getPhone() {
         return this.phone;
     }

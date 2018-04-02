@@ -11,6 +11,7 @@ import com.weeznn.weeji.R;
 import com.weeznn.weeji.util.db.entry.Diary;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by weeznn on 2018/3/22.
@@ -21,11 +22,11 @@ public class DiaryAdapter extends RecyclerView.Adapter{
 
     private Context context;
     private LayoutInflater inflater;
-    private ArrayList<Diary> data=new ArrayList<>();
+    private List<Diary> data=new ArrayList<>();
 
-    public DiaryAdapter(Context context, ArrayList<Diary> arrayList){
+    public DiaryAdapter(Context context, List<Diary> list){
         this.context=context;
-        this.data=arrayList;
+        this.data=list;
     }
 
     @Override
@@ -38,7 +39,7 @@ public class DiaryAdapter extends RecyclerView.Adapter{
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         DiaryViewHolder viewHolder=(DiaryViewHolder)holder;
-        Diary modul=data.get(position);
+        Diary modul=  data.get(position);
         viewHolder.mood.setText(modul.getMood());
         viewHolder.addr.setText(modul.getAddress());
         viewHolder.time.setText(modul.getDate());

@@ -24,7 +24,6 @@ import com.weeznn.baidu_speech.R;
 import com.weeznn.baidu_speech.imp.IStatus;
 import com.weeznn.baidu_speech.online.InFileStream;
 import com.weeznn.baidu_speech.online.MicrophoneInputStream;
-import com.weeznn.baidu_speech.util.FileUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;

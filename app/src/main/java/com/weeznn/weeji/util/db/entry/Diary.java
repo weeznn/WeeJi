@@ -19,9 +19,11 @@ public class Diary {
         this.address = address;
         this.mood = mood;
     }
+
     @Generated(hash = 112123061)
     public Diary() {
     }
+
     public String getDate() {
         return this.date;
     }

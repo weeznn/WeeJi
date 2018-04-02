@@ -20,11 +20,11 @@ import java.util.List;
 public class MettingAdapter extends RecyclerView.Adapter {
     private static final String TAG="meetingAdapter";
 
-    private ArrayList<Meeting> data=new ArrayList<>();
+    private List<Meeting> data=new ArrayList<>();
     private LayoutInflater inflater;
 
     public MettingAdapter(Context context, List<Meeting> moduls){
-        this.data= (ArrayList<Meeting>) moduls;
+        this.data= moduls;
         inflater=LayoutInflater.from(context);
     }
 
@@ -36,7 +36,7 @@ public class MettingAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        Meeting meetingModul=data.get(position);
+        Meeting meetingModul= data.get(position);
         MeetingViewHolder meetingViewHolder= ((MeetingViewHolder)holder);
         meetingViewHolder.title.setText(meetingModul.getTitle());
         meetingViewHolder.sub.setText(meetingModul.getSub());

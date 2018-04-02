@@ -13,16 +13,17 @@ import com.weeznn.weeji.R;
 import com.weeznn.weeji.util.db.entry.Note;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by weeznn on 2018/3/22.
  */
 
 public class NoteAdapter extends RecyclerView.Adapter {
-    private ArrayList<Note> data;
+    private List<Note> data;
     private LayoutInflater inflater;
 
-    public NoteAdapter(Context context,ArrayList<Note> list){
+    public NoteAdapter(Context context,List<Note> list){
         this.data=list;
         this.inflater=LayoutInflater.from(context);
     }
@@ -36,7 +37,7 @@ public class NoteAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        Note item=data.get(position);
+        Note item= data.get(position);
         NoteViewHolder viewHolder= (NoteViewHolder) holder;
         viewHolder.count.setText((item.get_noteID()+1)+"条");
         viewHolder.subtext.setText(item.getSub());
