@@ -152,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Log.i(TAG, "点击了 " + item.getTitle());
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.nav_seeting:
                 //去设置界面
                 Intent intent = new Intent(this, SettingsActivity.class);
@@ -161,25 +161,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_menu_collection:
             case R.id.nav_menu_meeting:
                 //更新Fragment 的内容
-                if (fragment.getTag()!="meeting"){
+                if (fragment.getTag() != "meeting") {
                     title.setText(item.getTitle());
-                    fragmentManager.beginTransaction().replace(R.id.frameLayout,new MettingFragment(),"meeting").commit();
+                    fragmentManager.beginTransaction().replace(R.id.frameLayout, new MettingFragment(), "meeting").commit();
                     drawerLayout.closeDrawer(GravityCompat.START);
                 }
                 break;
             case R.id.nav_menu_dairy:
                 //更新Fragment 的内容
-                if (fragment.getTag()!="dairy"){
+                if (fragment.getTag() != "dairy") {
                     title.setText(item.getTitle());
-                    fragmentManager.beginTransaction().replace(R.id.frameLayout,new DiaryFragment(),"dairy").commit();
+                    fragmentManager.beginTransaction().replace(R.id.frameLayout, new DiaryFragment(), "dairy").commit();
                     drawerLayout.closeDrawer(GravityCompat.START);
                 }
                 break;
             case R.id.nav_menu_note:
                 //更新Fragment 的内容
-                if (fragment.getTag()!="note"){
+                if (fragment.getTag() != "note") {
                     title.setText(item.getTitle());
-                    fragmentManager.beginTransaction().replace(R.id.frameLayout,new NoteFragment(),"note").commit();
+                    fragmentManager.beginTransaction().replace(R.id.frameLayout, new NoteFragment(), "note").commit();
                     drawerLayout.closeDrawer(GravityCompat.START);
                 }
                 break;

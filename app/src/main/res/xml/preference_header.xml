@@ -2,7 +2,7 @@
 <preference-headers
     xmlns:android="http://schemas.android.com/apk/res/android">
     <header
-        android:icon="@drawable/ic_mic_blue"
+        android:icon="@drawable/ic_mic"
         android:fragment="com.weeznn.weeji.fragment.BaiduSeettingFragment"
         android:title="@string/perference_baidu_title"/>
 
