@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
+import java.util.IdentityHashMap;
 
 /**
  * Created by weeznn on 2018/4/2.
@@ -30,10 +31,13 @@ public class FileUtil {
     public static final String FILE_TYPE_MEETING = "MEETING";
     public static final String FILE_TYPE_DAIRY = "DAIRY";
     public static final String FILE_TYPE_NOTE = "NOTE";
+    public static final int FILE_TYPE_JSON = 1;
+    public static final int FILE_TYPE_TEXT = 2;
+    private static final String TYPE_JSON = "_JSON.txt";
+    private static final String TYPE_TEXT = ".txt";
 
     /**
      * 创建文件夹
-     *
      * @param dirPath
      * @return
      */
@@ -45,6 +49,11 @@ public class FileUtil {
         } else {
             return true;
         }
+    }
+    public static boolean makeDir(String type,String name) {
+        String path = APPBASEPATH + type + "/"+ name;
+        Log.i(TAG,"makeDir :"+path);
+        return makeDir(path);
     }
 
     /**
@@ -156,8 +165,14 @@ public class FileUtil {
      * @param fileName
      * @param data
      */
-    public static void WriteText(String type, String fileName, String data) {
-        String path = APPBASEPATH + type + "/" + fileName + "/" + fileName + ".txt";
+    public static void WriteText(String type, String fileName,int filetype ,String data) {
+        String path = APPBASEPATH + type + "/" + fileName + "/"+fileName;
+        if (filetype==FILE_TYPE_JSON){
+            path=path+TYPE_JSON;
+        }else {
+            path=path+TYPE_TEXT;
+        }
+
         Log.i(TAG,"write text :"+path);
         try {
             FileWriter fileWriter = new FileWriter(path);

@@ -3,6 +3,7 @@
     <string name="about_app">「WeeJi」是一款捕捉灵感，提供快速记事服务的智能产品。数据同步百度网盘，共享2T超大空间，数据安全有保障、永恒存储不丢失。</string>
     <string name="SharedPreferences_name">com.weeznn.weeji_preferences</string>
     <string name="isFirst">first</string>
+    <string name="BAIDU_ASR_PACKAGE_NAME">com.weeznn.baidu_speech</string>
 
     <string name="perference_baidu_title">百度语音参数设置</string>
     <string name="perference_baidu_language_title">语言</string>
@@ -77,6 +78,26 @@
     <string name="pref_baidu_audio">audio</string>
     <string name="pref_baidu_ring">ring</string>
 
+    //我的
+    <string name="pref_self_name">name</string>
+    <string name="pref_self_job">job</string>
+    <string name="pref_self_company">company</string>
+    <string name="pref_self_number">number</string>
+    <string name="pref_self_email">email</string>
+    <string name="pref_self_photo">photo</string>
+    <string name="pref_sim_self_json">sim_self_json</string>
+    <string name="pref_self_json">self_json</string>
+
+
+    <string name="pref_self_def_name">我</string>
+    <string name="pref_self_def_job">##########</string>
+    <string name="pref_self_def_company">￥￥￥￥￥￥￥￥￥￥</string>
+    <string name="pref_self_def_number">11111111111</string>
+    <string name="pref_self_def_email">abcdef@xyz.com</string>
+    <string name="pref_self_def_photo"></string>
+    <string name="pref_self_def_json">{\"people\":[{\"name\":\"我\",\"job\":\"##########\","company":"￥￥￥￥￥￥￥￥￥￥","number":"11111111111","email":"abcdef@xyz.com","photo":""}]}</string>
+    <string name="pref_self_def_sim_json">{\"people\":[{\"name\":\"我\",\"photo\":\"\"}]}</string>
+
     //主页面侧边栏
     <string name="nav_skill_title">功能</string>
     <string name="nav_skill_collection">收藏</string>
@@ -84,12 +105,14 @@
     <string name="nav_skill_diary">日记</string>
     <string name="nav_skill_note">笔记</string>
     <string name="nav_setting">设置</string>
+    <string name="nav_self">我的</string>
     <string-array name="toolbar_title">
         <item>收藏</item>
         <item>会议</item>
         <item>日记</item>
         <item>笔记</item>
         <item>设置</item>
+        <item>我的</item>
     </string-array>
     <string name="nav_open">打开</string>
     <string name="nav_close">关闭</string>
@@ -115,7 +138,14 @@
     <string name="edit_hint_title">标题</string>
     <string name="edit_hint_sub">摘要</string>
     <string name="edit_hint_mood">心情</string>
+    <string name="edit_hint_name">姓名</string>
+    <string name="edit_hint_job">职位</string>
+    <string name="edit_hint_company">公司</string>
+    <string name="edit_hint_email">邮箱</string>
+    <string name="edit_hint_number">手机</string>
+
 
     //toobar text
     <string name="toolbar_text_select">已选择%1$n位联系人</string>
+
 </resources>

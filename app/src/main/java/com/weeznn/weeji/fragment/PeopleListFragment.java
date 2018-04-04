@@ -2,7 +2,6 @@ package com.weeznn.weeji.fragment;
 
 
 import android.annotation.SuppressLint;
-import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,7 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toolbar;
+
 
 import com.bumptech.glide.Glide;
 import com.weeznn.weeji.MyApplication;
@@ -34,7 +34,6 @@ import com.weeznn.weeji.util.db.PeopleDao;
 import com.weeznn.weeji.util.db.entry.People;
 
 import java.util.List;
-import java.util.TreeMap;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -45,7 +44,7 @@ public class PeopleListFragment extends Fragment {
     public static final String TAG_BACK = "PeopleList";
 
 
-    private static final String LIST_TYPE="list_type";
+    public static final String LIST_TYPE="list_type";
     public static final int LIST_TYPE_SHOW=1;
     public static final int LIST_TYPE_SELETE=2;
 
@@ -85,15 +84,11 @@ public class PeopleListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view;
-        if (listType ==LIST_TYPE_SHOW) {
-            view = inflater.inflate(R.layout.item_people_list_show, container, false);
-        } else {
-            view = inflater.inflate(R.layout.item_people_list_select, container, false);
-        }
+        view = inflater.inflate(R.layout.fragment_people_list, container, false);
         toolbar = view.findViewById(R.id.toolbar);
         toolbatText = view.findViewById(R.id.text);
         recyclerView=view.findViewById(R.id.recyclerView);
-        refreshLayout=view.findViewById(R.id.refreshLayout);
+        refreshLayout=view.findViewById(R.id.freshLayout);
         return view;
     }
 
@@ -108,8 +103,17 @@ public class PeopleListFragment extends Fragment {
             }
         });
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new PeopleListAdapter(getContext(),list,listType));
+        if (list==null){
+            getActivity().getWindowManager().removeView(recyclerView);
+            ImageView imageView=new ImageView(getContext());
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            imageView.setBackground(getResources().getDrawable(R.drawable.ic_404));
+            getActivity().getWindowManager().addView(imageView,refreshLayout.getLayoutParams());
+        }else {
+            recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+            recyclerView.setAdapter(new PeopleListAdapter(getContext(),list,listType));
+        }
+
 
         toolbar.setNavigationIcon(R.drawable.ic_arrow_left);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -124,7 +128,7 @@ public class PeopleListFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        getActivity().getMenuInflater().inflate(R.menu.people_list_menu,menu);
+        getActivity().getMenuInflater().inflate(R.menu.only_yes_menu,menu);
     }
 
     @Override
@@ -164,7 +168,12 @@ public class PeopleListFragment extends Fragment {
         private int listType;
 
         public PeopleListAdapter(Context context, List<People> list, int type) {
-            this.data = list;
+            if (list!=null){
+                this.data = list;
+            }else {
+                this.data=null;
+            }
+
             this.listType = type;
             this.inflater = LayoutInflater.from(context);
         }
@@ -277,7 +286,7 @@ public class PeopleListFragment extends Fragment {
 
         @Override
         public int getItemCount() {
-            return data.size();
+            return data==null?0:data.size();
         }
 
         public List<SimplePeople> getSimpleData() {

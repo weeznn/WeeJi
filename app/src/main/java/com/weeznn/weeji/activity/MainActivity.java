@@ -8,9 +8,9 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -19,18 +19,15 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.weeznn.weeji.MyApplication;
 import com.weeznn.weeji.R;
 import com.weeznn.weeji.fragment.DiaryFragment;
 import com.weeznn.weeji.fragment.MettingFragment;
 import com.weeznn.weeji.fragment.NoteFragment;
+import com.weeznn.weeji.fragment.PeopleDetailFragment;
 import com.weeznn.weeji.fragment.StartFragment;
-import com.weeznn.weeji.util.db.MeetingDao;
-import com.weeznn.weeji.util.db.entry.Meeting;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -40,12 +37,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView nav_header_text;
     private ImageView nav_header_back;
     private ImageView nav_header_imag;
-    private Toolbar toolbar;
     private TextView title;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
 
-    private Fragment fragment;
+    private Fragment defFragment;
     private FragmentManager fragmentManager;
 
     //逻辑相关
@@ -59,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Log.i(TAG, "开场动画结束");
                 getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new MettingFragment(), "meeting")
                         .commit();
-                toolbar.setVisibility(View.VISIBLE);
             }
             return true;
         }
@@ -79,7 +74,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         if (getSharedPreferences(getString(R.string.SharedPreferences_name), 0)
                 .getBoolean("isFirst", true)) {
-            toolbar.setVisibility(View.GONE);
             fragmentManager.beginTransaction().add(R.id.frameLayout, new StartFragment(), "start").commit();
 
             getSharedPreferences(getString(R.string.SharedPreferences_name), 0).edit()
@@ -94,26 +88,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }).start();
         } else {
-            toolbar.setVisibility(View.VISIBLE);
-            fragment = new MettingFragment();
-            fragmentManager.beginTransaction().add(R.id.frameLayout, fragment, "meeting").commit();
+            defFragment = new MettingFragment();
+            fragmentManager.beginTransaction().add(R.id.frameLayout, defFragment, "meeting").commit();
         }
 
     }
 
 
     private void initView() {
-        //toolbar
-        toolbar = findViewById(R.id.toolbar);
-        title = findViewById(R.id.title_text_view);
-        setSupportActionBar(toolbar);
-        title.setText(toolbarTitles[1]);
-//        ActionBar actionBar = getSupportActionBar();
-//        if (actionBar != null) {
-//            actionBar.setDisplayShowTitleEnabled(false);
-//        }
-
-
         //drawLayout
         //侧边栏
         drawerLayout = findViewById(R.id.drawerLayout);
@@ -136,12 +118,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.toolbar_menu, menu);
-        return true;
-    }
-
 
     /**
      * 点击了侧边栏的menu
@@ -161,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_menu_collection:
             case R.id.nav_menu_meeting:
                 //更新Fragment 的内容
-                if (fragment.getTag() != "meeting") {
+                if (defFragment.getTag() != "meeting") {
                     title.setText(item.getTitle());
                     fragmentManager.beginTransaction().replace(R.id.frameLayout, new MettingFragment(), "meeting").commit();
                     drawerLayout.closeDrawer(GravityCompat.START);
@@ -169,21 +145,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_menu_dairy:
                 //更新Fragment 的内容
-                if (fragment.getTag() != "dairy") {
+                if (defFragment.getTag() != "dairy") {
                     title.setText(item.getTitle());
                     fragmentManager.beginTransaction().replace(R.id.frameLayout, new DiaryFragment(), "dairy").commit();
                     drawerLayout.closeDrawer(GravityCompat.START);
                 }
                 break;
             case R.id.nav_menu_note:
-                //更新Fragment 的内容
-                if (fragment.getTag() != "note") {
+                //笔记
+                if (defFragment.getTag() != "note") {
                     title.setText(item.getTitle());
                     fragmentManager.beginTransaction().replace(R.id.frameLayout, new NoteFragment(), "note").commit();
                     drawerLayout.closeDrawer(GravityCompat.START);
                 }
                 break;
-
+            case R.id.nav_self:
+                //自我信息
+                Fragment fragment=new PeopleDetailFragment();
+                FragmentTransaction transaction=getSupportFragmentManager().beginTransaction();
+                transaction.add(fragment,PeopleDetailFragment.FLAG_BACK);
+                transaction.addToBackStack(defFragment.getTag());
+                transaction.commit();
+                break;
         }
         return true;
     }

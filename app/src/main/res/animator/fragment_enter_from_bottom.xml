@@ -6,11 +6,11 @@
         android:valueType="floatType"
         android:valueFrom="1000"
         android:valueTo="0"
-        android:duration="1000"/>
+        android:duration="100"/>
     <objectAnimator
         android:propertyName="y"
         android:valueType="floatType"
         android:valueFrom="1280"
         android:valueTo="0"
-        android:duration="3000"/>
+        android:duration="300"/>
 </set>

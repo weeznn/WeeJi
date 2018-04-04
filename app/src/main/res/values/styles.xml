@@ -16,7 +16,9 @@
         <item name="android:textColorHint">@color/colorWright</item>
     </style>
 
-
-
+    <style name="APPThemeFullScreen" parent="AppTheme">
+        <item name="windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+    </style>
 
 </resources>

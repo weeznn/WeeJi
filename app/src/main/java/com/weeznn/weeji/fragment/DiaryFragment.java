@@ -1,15 +1,20 @@
 package com.weeznn.weeji.fragment;
 
+import android.app.ActionBar;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.weeznn.weeji.MyApplication;
 import com.weeznn.weeji.R;
@@ -30,9 +35,15 @@ import java.util.List;
 public class DiaryFragment extends Fragment {
     private static final String TAG= DiaryFragment.class.getSimpleName();
 
+    //view
     private RecyclerView recyclerView;
     private SwipeRefreshLayout refreshLayout;
+    private Toolbar toolbar;
+    private TextView toolbarTitle;
+    private android.support.v7.app.ActionBar actionBar;
+    private FloatingActionButton fab;
 
+    //逻辑
     private List<Diary> data=new ArrayList<>();
     private DiaryAdapter adapter;
 
@@ -48,7 +59,9 @@ public class DiaryFragment extends Fragment {
         View view=inflater.inflate(R.layout.fragment_metting, container, false);
         recyclerView=view.findViewById(R.id.recyclerView);
         refreshLayout=view.findViewById(R.id.freshLayout);
-
+        toolbar=view.findViewById(R.id.toolbar);
+        toolbarTitle=view.findViewById(R.id.text);
+        fab=view.findViewById(R.id.fab);
         return view;
     }
 
@@ -77,6 +90,20 @@ public class DiaryFragment extends Fragment {
         //recyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+
+        //toolbar
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        actionBar=((AppCompatActivity)getActivity()).getSupportActionBar();
+       toolbarTitle.setText(R.string.nav_skill_diary);
+        toolbar.setTitleTextColor(getResources().getColor(R.color.colorWright));
+
+        //fab
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO: 2018/4/4 添加
+            }
+        });
     }
 
 }

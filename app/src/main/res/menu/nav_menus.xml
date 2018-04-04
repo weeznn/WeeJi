@@ -19,6 +19,10 @@
     </group>
 
     <item
+        android:id="@+id/nav_self"
+        android:icon="@drawable/ic_user_black"
+        android:title="@string/nav_self"/>
+    <item
         android:id="@+id/nav_seeting"
         android:icon="@drawable/ic_setting"
         android:title="@string/nav_setting"/>

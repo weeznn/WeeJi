@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -16,7 +17,7 @@ public class SimplePeople {
     private static final String TAG= SimplePeople.class.getSimpleName();
     private String name;
     private String photo;
-    private static List<SimplePeople> list;
+    private static List<SimplePeople> list=new LinkedList<>();
     public SimplePeople(String name,String photo){
         this.name=name;
         this.photo=photo;
@@ -38,6 +39,10 @@ public class SimplePeople {
         }else {
             list=null;
         }
+        if (list!=null){
+            Log.i(TAG,"list  size "+list.size());
+        }
+
         return list;
     }
 
@@ -45,13 +50,15 @@ public class SimplePeople {
         StringBuilder builder=new StringBuilder();
         builder.append("{"+
                             "\"people\":[");
-        for (SimplePeople people:list){
-            builder.append("{"+
-                                "\"name\":\""+people.name+"\","+
-                                "\"photo\":\""+people.photo+"\""+
-                            "}");
-            if (!(people==list.get(list.size()-1))){
-                builder.append(",");
+        if (list!=null){
+            for (SimplePeople people:list){
+                builder.append("{"+
+                        "\"name\":\""+people.name+"\","+
+                        "\"photo\":\""+people.photo+"\""+
+                        "}");
+                if (!(people==list.get(list.size()-1))){
+                    builder.append(",");
+                }
             }
         }
         builder.append("]}");

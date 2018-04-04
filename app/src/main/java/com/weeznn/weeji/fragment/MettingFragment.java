@@ -1,6 +1,7 @@
 package com.weeznn.weeji.fragment;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,12 +12,16 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.weeznn.weeji.MyApplication;
 import com.weeznn.weeji.R;
@@ -29,21 +34,26 @@ import java.util.List;
 
 public class MettingFragment extends Fragment {
     private static final String TAG=MettingFragment.class.getSimpleName();
+    public static final String TAG_BACK="Metting";
 
     //View
     private RecyclerView recyclerView;
     private SwipeRefreshLayout refreshLayout;
     private FloatingActionButton fab;
+    private Toolbar toolbar;
+    private TextView toolbarTitle;
+    private ActionBar actionBar;
 
     //逻辑
     private List<Meeting> data=new ArrayList<>();
     private MettingAdapter mettingAdapter;
+    private Fragment fragment;
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(TAG,"oncreat");
+        Log.i(TAG,"onCreat");
         mettingAdapter=new MettingAdapter(getContext(),data);
     }
 
@@ -55,7 +65,8 @@ public class MettingFragment extends Fragment {
         recyclerView=view.findViewById(R.id.recyclerView);
         refreshLayout=view.findViewById(R.id.freshLayout);
         fab=view.findViewById(R.id.fab);
-
+        toolbar=view.findViewById(R.id.toolbar);
+        toolbarTitle=view.findViewById(R.id.text);
         return view;
     }
 
@@ -76,7 +87,6 @@ public class MettingFragment extends Fragment {
                                 .limit(10)
                                 .list();
                         Log.i(TAG,"onRefresh data size ="+data.size());
-
                         mettingAdapter.notifyDataSetChanged();
                         refreshLayout.setRefreshing(false);
                         Log.i(TAG,"refreshLayout is refreshing "+refreshLayout.isRefreshing());
@@ -94,11 +104,29 @@ public class MettingFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                Fragment meetingPreEditfragment=new MeetingPreEditFragment();
+                Bundle bundle=new Bundle();
+                String self=getActivity().getSharedPreferences(getString(R.string.SharedPreferences_name),0)
+                        .getString(getString(R.string.pref_sim_self_json),getString(R.string.pref_self_def_sim_json));
+                bundle.putString(MeetingPreEditFragment.FLAG_PEOPLES,self);
+                meetingPreEditfragment.setArguments(bundle);
+
                 FragmentTransaction transaction=getActivity().getSupportFragmentManager().beginTransaction();
                 transaction.setCustomAnimations(R.animator.fragment_enter_from_bottom,R.animator.fragment_exit_to_bottom);
-                transaction.add(new MeetingPreEditFragment(),MeetingPreEditFragment.TAG_BACK).commit();
+                transaction.add(R.id.frameLayout,meetingPreEditfragment,MeetingPreEditFragment.TAG_BACK);
+                transaction.addToBackStack(MettingFragment.TAG_BACK);
+                //transaction.hide(fragment);
+                transaction.commit();
             }
         });
+
+        //toolbar
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        actionBar=((AppCompatActivity)getActivity()).getSupportActionBar();
+        toolbarTitle.setText(R.string.nav_skill_meeting);
+        toolbar.setTitleTextColor(getResources().getColor(R.color.colorWright));
+
     }
 
 
