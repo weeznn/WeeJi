@@ -1,7 +1,9 @@
 package com.weeznn.weeji.adpater;
 
 import android.content.Context;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +19,7 @@ import java.util.List;
  * Created by weeznn on 2018/3/14.
  */
 
-public class MettingAdapter extends RecyclerView.Adapter {
+public class MettingAdapter extends RecyclerView.Adapter <MettingAdapter.MeetingViewHolder>{
     private static final String TAG="meetingAdapter";
 
     private List<Meeting> data=new ArrayList<>();
@@ -29,20 +31,26 @@ public class MettingAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public MeetingViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view=inflater.inflate(R.layout.card_meeting,parent,false);
         return new MeetingViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(MeetingViewHolder holder, int position) {
         Meeting meetingModul= data.get(position);
-        MeetingViewHolder meetingViewHolder= ((MeetingViewHolder)holder);
-        meetingViewHolder.title.setText(meetingModul.getTitle());
-        meetingViewHolder.sub.setText(meetingModul.getSub());
-        meetingViewHolder.keyWord3.setText(meetingModul.getKeyword3());
-        meetingViewHolder.keyWord2.setText(meetingModul.getKeyword2());
-        meetingViewHolder.keyWord1.setText(meetingModul.getKeyword1());
+        holder.title.setText(meetingModul.getTitle());
+        holder.sub.setText(meetingModul.getSub());
+        holder.keyWord3.setText(meetingModul.getKeyword3());
+        holder.keyWord2.setText(meetingModul.getKeyword2());
+        holder.keyWord1.setText(meetingModul.getKeyword1());
+
+        holder.layout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 
 
@@ -51,13 +59,14 @@ public class MettingAdapter extends RecyclerView.Adapter {
         return data.size();
     }
 
-    private static final class MeetingViewHolder extends RecyclerView.ViewHolder{
+    public class MeetingViewHolder extends RecyclerView.ViewHolder{
 
-        private TextView title;
-        private TextView sub;
-        private TextView keyWord1;
-        private TextView keyWord2;
-        private TextView keyWord3;
+        public TextView title;
+        public TextView sub;
+        public TextView keyWord1;
+        public TextView keyWord2;
+        public TextView keyWord3;
+        public ConstraintLayout layout;
         public MeetingViewHolder(View itemView) {
             super(itemView);
             title=itemView.findViewById(R.id.title);
@@ -65,6 +74,7 @@ public class MettingAdapter extends RecyclerView.Adapter {
             keyWord1=itemView.findViewById(R.id.key_word_1);
             keyWord2=itemView.findViewById(R.id.key_word_2);
             keyWord3=itemView.findViewById(R.id.key_word_3);
+            layout=itemView.findViewById(R.id.layout);
         }
 
     }

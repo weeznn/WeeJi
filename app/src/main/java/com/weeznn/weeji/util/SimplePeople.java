@@ -16,11 +16,15 @@ import java.util.List;
 public class SimplePeople {
     private static final String TAG= SimplePeople.class.getSimpleName();
     private String name;
+    private String job;
+    private String company;
     private String photo;
     private static List<SimplePeople> list=new LinkedList<>();
-    public SimplePeople(String name,String photo){
+    public SimplePeople(String name,String photo,String job,String company){
         this.name=name;
         this.photo=photo;
+        this.job=job;
+        this.company=company;
     }
 
     public static List<SimplePeople> getListFromJson(String json){
@@ -30,7 +34,7 @@ public class SimplePeople {
                 JSONArray peoples = (JSONArray) object.get("people");
                 for (int i = 0; i < peoples.length(); i++) {
                     JSONObject peo = peoples.getJSONObject(i);
-                    SimplePeople people=new SimplePeople(peo.getString("name"),peo.getString("photo"));
+                    SimplePeople people=new SimplePeople(peo.getString("name"),peo.getString("photo"),peo.getString("job"),peo.getString("company"));
                     list.add(people);
                 }
             } catch (JSONException e) {
@@ -42,6 +46,12 @@ public class SimplePeople {
         if (list!=null){
             Log.i(TAG,"list  size "+list.size());
         }
+
+        // TODO: 2018/4/5 测试数据，记得删除
+        list.add(new SimplePeople("qqqqqq","","qqqqqq","qqqqqqqqq"));
+        list.add(new SimplePeople("qqqqqq","","qqqqqq","qqqqqqqqq"));
+        list.add(new SimplePeople("qqqqqq","","qqqqqq","qqqqqqqqq"));
+        list.add(new SimplePeople("qqqqqq","","qqqqqq","qqqqqqqqq"));
 
         return list;
     }
@@ -55,6 +65,8 @@ public class SimplePeople {
                 builder.append("{"+
                         "\"name\":\""+people.name+"\","+
                         "\"photo\":\""+people.photo+"\""+
+                        "\"job\":\""+people.job+"\","+
+                        "\"company\":\""+people.company+"\""+
                         "}");
                 if (!(people==list.get(list.size()-1))){
                     builder.append(",");
@@ -80,5 +92,21 @@ public class SimplePeople {
 
     public void setPhoto(String photo) {
         this.photo = photo;
+    }
+
+    public String getJob() {
+        return job;
+    }
+
+    public void setJob(String job) {
+        this.job = job;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public void setCompany(String company) {
+        this.company = company;
     }
 }

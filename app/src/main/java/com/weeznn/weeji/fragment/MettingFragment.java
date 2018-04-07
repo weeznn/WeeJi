@@ -1,8 +1,8 @@
 package com.weeznn.weeji.fragment;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.net.Uri;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -28,6 +28,7 @@ import com.weeznn.weeji.R;
 import com.weeznn.weeji.adpater.MettingAdapter;
 import com.weeznn.weeji.util.db.MeetingDao;
 import com.weeznn.weeji.util.db.entry.Meeting;
+import com.weeznn.weeji.util.db.entry.People;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,14 +49,34 @@ public class MettingFragment extends Fragment {
     private List<Meeting> data=new ArrayList<>();
     private MettingAdapter mettingAdapter;
     private Fragment fragment;
+    private Handler handler=new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            refreshLayout.setRefreshing(false);
+            return true;
+        }
+    });
 
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(TAG,"onCreat");
-        mettingAdapter=new MettingAdapter(getContext(),data);
+        hasOptionsMenu();
+        fragment=this;
+
     }
+
+    private void initdata() {
+        data.add(new Meeting(111111,"2018/4/5","这是TITLE","asdfadf","adfasdfas","adfsfafd","dadfadsf","qwertytyuiodfghdal;kdsjfal;kdjf","mmm"));
+        data.add(new Meeting(111111,"2018/4/5","这是TITLE","asdfadf","adfasdfas","adfsfafd","dadfadsf","qwertytyuiodfghdal;kdsjfal;kdjf","mmm"));
+        data.add(new Meeting(111111,"2018/4/5","这是TITLE","asdfadf","adfasdfas","adfsfafd","dadfadsf","qwertytyuiodfghdal;kdsjfal;kdjf","mmm"));
+        data.add(new Meeting(111111,"2018/4/5","这是TITLE","asdfadf","adfasdfas","adfsfafd","dadfadsf","qwertytyuiodfghdal;kdsjfal;kdjf","mmm"));
+        data.add(new Meeting(111111,"2018/4/5","这是TITLE","asdfadf","adfasdfas","adfsfafd","dadfadsf","qwertytyuiodfghdal;kdsjfal;kdjf","mmm"));
+        data.add(new Meeting(111111,"2018/4/5","这是TITLE","asdfadf","adfasdfas","adfsfafd","dadfadsf","qwertytyuiodfghdal;kdsjfal;kdjf","mmm"));
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -79,25 +100,14 @@ public class MettingFragment extends Fragment {
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                MyApplication.getInstant().runInTx(new Runnable() {
-                    @Override
-                    public void run() {
-                        MeetingDao meetingDao=MyApplication.getInstant().getMeetingDao();
-                        data=meetingDao.queryBuilder()
-                                .limit(10)
-                                .list();
-                        Log.i(TAG,"onRefresh data size ="+data.size());
-                        mettingAdapter.notifyDataSetChanged();
-                        refreshLayout.setRefreshing(false);
-                        Log.i(TAG,"refreshLayout is refreshing "+refreshLayout.isRefreshing());
-                    }
-                });
+                updata();
+                refreshLayout.setRefreshing(false);
             }
         });
 
-
         //recyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mettingAdapter=new MettingAdapter(getContext(),data);
         recyclerView.setAdapter(mettingAdapter);
 
         //fab
@@ -113,10 +123,11 @@ public class MettingFragment extends Fragment {
                 meetingPreEditfragment.setArguments(bundle);
 
                 FragmentTransaction transaction=getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.setCustomAnimations(R.animator.fragment_enter_from_bottom,R.animator.fragment_exit_to_bottom);
-                transaction.add(R.id.frameLayout,meetingPreEditfragment,MeetingPreEditFragment.TAG_BACK);
                 transaction.addToBackStack(MettingFragment.TAG_BACK);
-                //transaction.hide(fragment);
+                transaction.hide(fragment);
+
+                transaction.setCustomAnimations(R.animator.fragment_enter_from_bottom,R.animator.fragment_exit_to_left);
+                transaction.add(R.id.frameLayout,meetingPreEditfragment,MeetingPreEditFragment.TAG_BACK);
                 transaction.commit();
             }
         });
@@ -125,10 +136,41 @@ public class MettingFragment extends Fragment {
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         actionBar=((AppCompatActivity)getActivity()).getSupportActionBar();
         toolbarTitle.setText(R.string.nav_skill_meeting);
-        toolbar.setTitleTextColor(getResources().getColor(R.color.colorWright));
 
     }
 
+    private void updata(){
+        MyApplication.getInstant().runInTx(new Runnable() {
+            @Override
+            public void run() {
+                MeetingDao meetingDao=MyApplication.getInstant().getMeetingDao();
+                List<Meeting>list=meetingDao.queryBuilder()
+                        .limit(10)
+                        .list();
 
+                data.addAll(list);
+                initdata();
+                Log.i(TAG,"onRefresh data size ="+data.size());
+                mettingAdapter.notifyDataSetChanged();
+                handler.sendMessage(new Message());
+                Log.i(TAG,"refreshLayout is refreshing "+refreshLayout.isRefreshing());
+            }
+        });
+    }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        //第一次添加数据
+        refreshLayout.setRefreshing(true);
+        while (refreshLayout.isRefreshing()){
+            updata();
+            refreshLayout.setRefreshing(false);
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        //super.onSaveInstanceState(outState);
+    }
 }

@@ -6,14 +6,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -32,8 +33,10 @@ import com.bumptech.glide.request.RequestOptions;
 import com.weeznn.mylibrary.utils.FileUtil;
 import com.weeznn.weeji.R;
 import com.weeznn.weeji.util.SimplePeople;
+import com.weeznn.weeji.util.db.entry.People;
 
-import java.lang.annotation.ElementType;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -57,7 +60,7 @@ public class MeetingPreEditFragment extends Fragment {
     private ActionBar actionBar;
 
     //逻辑
-    private List<SimplePeople> list;
+    private List<SimplePeople> list=new LinkedList<>();
     private String title;
     private String sub;
     private Fragment fragment;
@@ -74,18 +77,17 @@ public class MeetingPreEditFragment extends Fragment {
         //获取参会人信息
         String json = getArguments().getString(FLAG_PEOPLES);
         Log.i(TAG,"arg :"+json);
+        list.clear();
         list = SimplePeople.getListFromJson(json);
 
+
         if (savedInstanceState != null && !"".equals(savedInstanceState.getString(FLAG_PEOPLES))) {
-            list.clear();
             String json1 = savedInstanceState.getString(KEY_PEOPLELIST);
-            for (SimplePeople people : SimplePeople.getListFromJson(json1)) {
-                list.add(people);
-            }
+
+            list.addAll(SimplePeople.getListFromJson(json1));
             sub = savedInstanceState.getString(KEY_SUB);
             title = savedInstanceState.getString(KEY_TITLE);
         }
-        Log.i(TAG, "onViewStateRestored");
     }
 
     @Override
@@ -113,9 +115,12 @@ public class MeetingPreEditFragment extends Fragment {
                 Bundle bundle=new Bundle();
                 bundle.putInt(PeopleListFragment.LIST_TYPE,PeopleListFragment.LIST_TYPE_SELETE);
                 peopleListFragment.setArguments(bundle);
+
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.add(R.id.frameLayout,peopleListFragment , PeopleListFragment.TAG_BACK);
                 transaction.addToBackStack(MeetingPreEditFragment.TAG_BACK);
+                transaction.hide(fragment);
+                transaction.setCustomAnimations(R.animator.fragment_enter_from_bottom,R.animator.fragment_exit_to_left);
+                transaction.add(R.id.frameLayout,peopleListFragment , PeopleListFragment.TAG_BACK);
                 transaction.commit();
             }
         });
@@ -123,7 +128,7 @@ public class MeetingPreEditFragment extends Fragment {
         titleView.setText(title);
         subView.setText(sub);
         //recyclerView
-        recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 2));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(new PreEditAdapter(getContext(), list));
 
         //toolbar
@@ -135,11 +140,22 @@ public class MeetingPreEditFragment extends Fragment {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().getSupportFragmentManager().beginTransaction()
-                        .remove(fragment)
-                        .commit();
+                FragmentManager manager=getActivity().getSupportFragmentManager();
+                manager.popBackStack();
+                manager.beginTransaction().show(manager.findFragmentByTag(MettingFragment.TAG_BACK));
+
             }
         });
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString(KEY_TITLE, titleView.getText().toString());
+        outState.putString(KEY_SUB, subView.getText().toString());
+        outState.putString(KEY_PEOPLELIST, SimplePeople.list2String(list));
+
+        Log.i(TAG, "onSaveInstanceState");
     }
 
     @Override
@@ -153,13 +169,16 @@ public class MeetingPreEditFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId()==R.id.yes){
+            String json=SimplePeople.list2String(list);
+            //转到百度语音
             Intent intent=getActivity().getPackageManager().getLaunchIntentForPackage(getString(R.string.BAIDU_ASR_PACKAGE_NAME));
             if (intent!=null){
                 Log.i(TAG,"GO TO BAIDU ASR");
                 intent.putExtra("title",titleView.getText().toString());
                 intent.putExtra("sub",subView.getText().toString());
-                writePeoples2Stonge(list,titleView.getText().toString());
-                startActivity(intent);
+                intent.putExtra("type",FileUtil.FILE_TYPE_MEETING);
+                intent.putExtra("peoples",json);
+                startActivityForResult(intent,R.integer.REQUEST_CODE_MET);
             }
 
             Log.i(TAG,"PRE EDIT DOWN");
@@ -167,47 +186,29 @@ public class MeetingPreEditFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * 将参会人员的简单信息保存到磁盘
-     * @param list
-     */
-    private void writePeoples2Stonge(final List<SimplePeople> list,final String title) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                String json=SimplePeople.list2String(list);
-                if (FileUtil.makeDir(FileUtil.FILE_TYPE_MEETING,title)){
-                    FileUtil.WriteText(FileUtil.FILE_TYPE_MEETING,title,FileUtil.FILE_TYPE_JSON,json);
-                }else {
-                    Log.i(TAG,"未写入文件");
-                }
-            }
-        });
 
-    }
-
-    private class PreEditAdapter extends RecyclerView.Adapter {
+    private class PreEditAdapter extends RecyclerView.Adapter<PreEditViewHolder> {
+        private final String TAG=PreEditAdapter.class.getSimpleName();
 
         private List<SimplePeople> data;
         private LayoutInflater inflater;
 
         public PreEditAdapter(Context context, List<SimplePeople> list) {
-            this.data = list!=null?list:null;
+            this.data = list;
             inflater = LayoutInflater.from(context);
         }
 
         @Override
-        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public PreEditViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = inflater.inflate(R.layout.item_meeting_people, parent, false);
             return new PreEditViewHolder(view);
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-            final PreEditViewHolder viewHolder = (PreEditViewHolder) holder;
+        public void onBindViewHolder(final PreEditViewHolder viewHolder, final int position) {
             SimplePeople people = data.get(position);
 
-            viewHolder.cardView.setOnClickListener(new View.OnClickListener() {
+            viewHolder.layout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     viewHolder.btn.setVisibility(View.VISIBLE);
@@ -218,6 +219,7 @@ public class MeetingPreEditFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     data.remove(position);
+                    getView().setVisibility(View.GONE);
                     notifyDataSetChanged();
                 }
             });
@@ -232,7 +234,9 @@ public class MeetingPreEditFragment extends Fragment {
                     .into(viewHolder.imageView);
 
             viewHolder.name.setText(people.getName());
+            viewHolder.job.setText(people.getCompany()+" | "+people.getJob());
         }
+
 
         @Override
         public int getItemCount() {
@@ -240,44 +244,21 @@ public class MeetingPreEditFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(KEY_TITLE, titleView.getText().toString());
-        outState.putString(KEY_SUB, subView.getText().toString());
-        outState.putString(KEY_PEOPLELIST, SimplePeople.list2String(list));
+    public class PreEditViewHolder extends RecyclerView.ViewHolder {
 
-        Log.i(TAG, "onSaveInstanceState");
-    }
-
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-        super.onViewStateRestored(savedInstanceState);
-//        if (savedInstanceState != null && !"".equals(savedInstanceState.getString(FLAG_PEOPLES))) {
-//            list.clear();
-//            String json1 = savedInstanceState.getString(KEY_PEOPLELIST);
-//            for (SimplePeople people : SimplePeople.getListFromJson(json1)) {
-//                list.add(people);
-//            }
-//            sub = savedInstanceState.getString(KEY_SUB);
-//            title = savedInstanceState.getString(KEY_TITLE);
-//        }
-//        Log.i(TAG, "onViewStateRestored");
-    }
-
-    private class PreEditViewHolder extends RecyclerView.ViewHolder {
-
-        private TextView name;
-        private Button btn;
-        private ImageView imageView;
-        private CardView cardView;
+        public TextView name;
+        public TextView job;
+        public Button btn;
+        public ImageView imageView;
+        public ConstraintLayout layout;
 
         public PreEditViewHolder(View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.name);
+            job=itemView.findViewById(R.id.job);
             btn = itemView.findViewById(R.id.btn);
             imageView = itemView.findViewById(R.id.image);
-            cardView = itemView.findViewById(R.id.card);
+            layout = itemView.findViewById(R.id.card);
         }
     }
 

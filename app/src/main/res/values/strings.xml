@@ -96,7 +96,7 @@
     <string name="pref_self_def_email">abcdef@xyz.com</string>
     <string name="pref_self_def_photo"></string>
     <string name="pref_self_def_json">{\"people\":[{\"name\":\"我\",\"job\":\"##########\","company":"￥￥￥￥￥￥￥￥￥￥","number":"11111111111","email":"abcdef@xyz.com","photo":""}]}</string>
-    <string name="pref_self_def_sim_json">{\"people\":[{\"name\":\"我\",\"photo\":\"\"}]}</string>
+    <string name="pref_self_def_sim_json">{\"people\":[{\"name\":\"我\",\"photo\":\"\",\"job\":\"##########\",\"company\":\"￥￥￥￥￥￥￥￥￥￥\"}]}</string>
 
     //主页面侧边栏
     <string name="nav_skill_title">功能</string>
@@ -147,5 +147,54 @@
 
     //toobar text
     <string name="toolbar_text_select">已选择%1$n位联系人</string>
+
+    <string name="lxr_list_null">联系人列表为空!!!</string>
+
+    <!--Intent 中传递的各个表的属性-->
+    <!--Table MET-->
+    <string name="TABLE_MET_metID">_metID</string>
+    <string name="TABLE_MET_time">time</string>
+    <string name="TABLE_MET_title">title</string>
+    <string name="TABLE_MET_sub">sub</string>
+    <string name="TABLE_MET_keyword1">keyword1</string>
+    <string name="TABLE_MET_keyword2">keyword2</string>
+    <string name="TABLE_MET_keyword3">keyword3</string>
+    <string name="TABLE_MET_address">address</string>
+    <string name="TABLE_MET_modetator">modetator</string>
+
+    <!--Table DAI-->
+    <string name="TABLE_DAI_date">date</string>
+    <string name="TABLE_DAI_address">address</string>
+    <string name="TABLE_DAI_mood">mood</string>
+    <!--Table NOT-->
+
+    <string name="TABLE_NOT_noteID">_noteID</string>
+    <string name="TABLE_NOT_time">time</string>
+    <string name="TABLE_NOT_cache">cache</string>
+    <string name="TABLE_NOT_sub">sub</string>
+    <string name="TABLE_NOT_source">source</string>
+    <!--Table PEO-->
+
+    <!--intent 中传递的CODE-->
+    <string name="LEFT_TYPE">type</string>
+    <string name="LEFT_CODE">code</string>
+
+
+    <!--打开百度语音服务时的请求码 -->
+    <integer name="REQUEST_CODE_MET">0</integer>
+    <integer name="REQUEST_CODE_DIA">1</integer>
+    <integer name="REQUEST_CODE_NOT">2</integer>
+
+    <!--百度语音服务的返回码 -->
+    <integer name="RESOULT_CODE_DOWN">1</integer>
+    <integer name="RESOULT_CODE_CANCEL">0</integer>
+
+    <!--CODE-->
+    <integer name="CODE_MRT">1</integer>
+    <integer name="CODE_DAI">2</integer>
+    <integer name="CODE_NOT">3</integer>
+
+    <dimen name="toolbarHeight">?attr/actionBarSize</dimen>
+    <dimen name="subScription_Head">240dp</dimen>
 
 </resources>

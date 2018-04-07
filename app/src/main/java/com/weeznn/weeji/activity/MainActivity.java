@@ -22,12 +22,19 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.weeznn.weeji.MyApplication;
 import com.weeznn.weeji.R;
 import com.weeznn.weeji.fragment.DiaryFragment;
 import com.weeznn.weeji.fragment.MettingFragment;
 import com.weeznn.weeji.fragment.NoteFragment;
 import com.weeznn.weeji.fragment.PeopleDetailFragment;
 import com.weeznn.weeji.fragment.StartFragment;
+import com.weeznn.weeji.util.db.DiaryDao;
+import com.weeznn.weeji.util.db.MeetingDao;
+import com.weeznn.weeji.util.db.NoteDao;
+import com.weeznn.weeji.util.db.entry.Diary;
+import com.weeznn.weeji.util.db.entry.Meeting;
+import com.weeznn.weeji.util.db.entry.Note;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -44,8 +51,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Fragment defFragment;
     private FragmentManager fragmentManager;
 
-    //逻辑相关
-    private String[] toolbarTitles;
+
     //handler 用于计时等待开启动画结束将fragment置换
     private static final int ISANIMATIONSTOP = 1;
     private Handler handler = new Handler(new Handler.Callback() {
@@ -53,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         public boolean handleMessage(Message msg) {
             if (msg.what == ISANIMATIONSTOP) {
                 Log.i(TAG, "开场动画结束");
-                getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new MettingFragment(), "meeting")
+                getSupportFragmentManager().beginTransaction().replace(R.id.frameLayout, new MettingFragment(), MettingFragment.TAG_BACK)
                         .commit();
             }
             return true;
@@ -66,9 +72,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main_2);
         Log.i(TAG, "onCreat");
 
-        toolbarTitles = getResources().getStringArray(R.array.toolbar_title);
         initView();
-
 
         fragmentManager = getSupportFragmentManager();
 
@@ -89,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }).start();
         } else {
             defFragment = new MettingFragment();
-            fragmentManager.beginTransaction().add(R.id.frameLayout, defFragment, "meeting").commit();
+            fragmentManager.beginTransaction().add(R.id.frameLayout, defFragment, MettingFragment.TAG_BACK).commit();
         }
 
     }
@@ -161,9 +165,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_self:
                 //自我信息
-                Fragment fragment=new PeopleDetailFragment();
-                FragmentTransaction transaction=getSupportFragmentManager().beginTransaction();
-                transaction.add(fragment,PeopleDetailFragment.FLAG_BACK);
+                Fragment fragment = new PeopleDetailFragment();
+                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                transaction.add(fragment, PeopleDetailFragment.FLAG_BACK);
                 transaction.addToBackStack(defFragment.getTag());
                 transaction.commit();
                 break;
@@ -179,7 +183,71 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            getSupportFragmentManager().popBackStack();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        final Bundle bundle = data.getBundleExtra("result");
+        switch (requestCode) {
+            case R.integer.REQUEST_CODE_MET:
+                if (resultCode == R.integer.RESOULT_CODE_DOWN) {
+                    MyApplication.getInstant().runInTx(new Runnable() {
+                        @Override
+                        public void run() {
+                            MeetingDao dao = MyApplication.getInstant().getMeetingDao();
+                            dao.insert(
+                                    new Meeting(Long.decode(bundle.getString(getResources().getString(R.string.TABLE_MET_metID),"未命名".hashCode()+"")),
+                                            bundle.getString(getResources().getString(R.string.TABLE_MET_time),""),
+                                            bundle.getString(getResources().getString(R.string.TABLE_MET_title),""),
+                                            bundle.getString(getResources().getString(R.string.TABLE_MET_sub),""),
+                                            bundle.getString(getResources().getString(R.string.TABLE_MET_keyword1),""),
+                                            bundle.getString(getResources().getString(R.string.TABLE_MET_keyword2),""),
+                                            bundle.getString(getResources().getString(R.string.TABLE_MET_keyword3),""),
+                                            bundle.getString(getResources().getString(R.string.TABLE_MET_address),""),
+                                            bundle.getString(getResources().getString(R.string.TABLE_MET_modetator),"")
+                                    ));
+                        }
+                    });
+                }
+                break;
+            case R.integer.REQUEST_CODE_DIA:
+                if (resultCode == R.integer.RESOULT_CODE_DOWN) {
+                    MyApplication.getInstant().runInTx(new Runnable() {
+                        @Override
+                        public void run() {
+                            DiaryDao dao = MyApplication.getInstant().getDiaryDao();
+                            dao.insert(
+                                    new Diary(
+                                            bundle.getString(getResources().getString(R.string.TABLE_DAI_date),""),
+                                            bundle.getString(getResources().getString(R.string.TABLE_DAI_address),""),
+                                            bundle.getInt(getResources().getString(R.string.TABLE_DAI_mood),0)
+                                    ));
+                        }
+                    });
+                }
+                break;
+            case R.integer.REQUEST_CODE_NOT:
+                if (resultCode == R.integer.RESOULT_CODE_DOWN) {
+                    MyApplication.getInstant().runInTx(new Runnable() {
+                        @Override
+                        public void run() {
+                            NoteDao dao = MyApplication.getInstant().getNoteDao();
+                            dao.insert(
+                                    new Note(
+                                            Long.decode(bundle.getString(getResources().getString(R.string.TABLE_NOT_noteID),"未命名".hashCode()+"")),
+                                            bundle.getString(getResources().getString(R.string.TABLE_NOT_time),""),
+                                            bundle.getString(getResources().getString(R.string.TABLE_NOT_cache),""),
+                                            bundle.getString(getResources().getString(R.string.TABLE_NOT_sub),""),
+                                            bundle.getInt(getResources().getString(R.string.TABLE_NOT_source),0)
+                                    ));
+                        }
+                    });
+                }
+                break;
+        }
+        Log.i(TAG,"OnActivityResult");
     }
 }

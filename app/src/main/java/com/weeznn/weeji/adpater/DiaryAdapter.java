@@ -17,7 +17,7 @@ import java.util.List;
  * Created by weeznn on 2018/3/22.
  */
 
-public class DiaryAdapter extends RecyclerView.Adapter{
+public class DiaryAdapter extends RecyclerView.Adapter<DiaryAdapter.DiaryViewHolder>{
     private static final String TAG=DiaryAdapter.class.getSimpleName();
 
     private Context context;
@@ -30,30 +30,30 @@ public class DiaryAdapter extends RecyclerView.Adapter{
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public DiaryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         inflater=LayoutInflater.from(context);
         View view=inflater.inflate(R.layout.card_dialy,parent,false);
         return new DiaryViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        DiaryViewHolder viewHolder=(DiaryViewHolder)holder;
+    public void onBindViewHolder(DiaryViewHolder holder, int position) {
         Diary modul=  data.get(position);
-        viewHolder.mood.setText(modul.getMood());
-        viewHolder.addr.setText(modul.getAddress());
-        viewHolder.time.setText(modul.getDate());
+        holder.mood.setText(modul.getMood());
+        holder.addr.setText(modul.getAddress());
+        holder.time.setText(modul.getDate());
     }
+
 
     @Override
     public int getItemCount() {
         return data.size();
     }
 
-    private class DiaryViewHolder extends RecyclerView.ViewHolder{
-        private TextView time;
-        private TextView addr;
-        private TextView mood;
+    public class DiaryViewHolder extends RecyclerView.ViewHolder{
+        public TextView time;
+        public TextView addr;
+        public TextView mood;
 
         public DiaryViewHolder(View itemView) {
             super(itemView);

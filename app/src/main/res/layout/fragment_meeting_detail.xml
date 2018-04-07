@@ -1,0 +1,70 @@
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.weeznn.weeji.fragment.MeetingDetailFragment">
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:id="@+id/collapsingToolbar"
+            app:toolbarId="@id/toolbar"
+            app:collapsedTitleGravity="start"
+            app:collapsedTitleTextAppearance="@color/colorWright"
+            app:expandedTitleMarginStart="32dp"
+            app:expandedTitleMarginBottom="48dp"
+            app:expandedTitleTextAppearance="@color/colorWright"
+            app:contentScrim="@color/colorPrimaryDark"
+            android:background="@color/colorPrimaryDark"
+            android:minHeight="20dp"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlwaysCollapsed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <include
+                layout="@layout/card_meeting"
+                android:id="@+id/back_drop"
+                android:scaleType="centerCrop"
+                app:layout_collapseMode="pin"
+                app:layout_collapseParallaxMultiplier="0.5"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/subScription_Head" >
+            </include>
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:background="@color/colorPrimaryDark"
+                app:layout_collapseMode="pin"
+                app:titleTextColor="@color/colorWright"
+                app:subtitleTextColor="@color/colorWright"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"/>
+        </android.support.design.widget.CollapsingToolbarLayout>
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </android.support.v4.widget.NestedScrollView>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/player"
+        app:fabSize="normal"
+        app:layout_anchor="@id/appbar"
+        app:backgroundTint="@color/colorPrimaryDark"
+        android:src="@drawable/ic_play_arrow_black_24dp"
+        app:layout_anchorGravity="end|bottom|right"
+        android:layout_marginRight="16dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+</android.support.design.widget.CoordinatorLayout>

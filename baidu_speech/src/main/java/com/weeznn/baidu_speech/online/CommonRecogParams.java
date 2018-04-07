@@ -7,6 +7,7 @@ import android.os.Environment;
 import com.baidu.speech.asr.SpeechConstant;
 import com.weeznn.baidu_speech.R;
 import com.weeznn.baidu_speech.util.Logger;
+import com.weeznn.mylibrary.utils.FileUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;

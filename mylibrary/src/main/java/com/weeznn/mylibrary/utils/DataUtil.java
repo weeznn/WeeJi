@@ -10,29 +10,16 @@ import java.util.Date;
  */
 
 public class DataUtil {
-    public static final String TAG=DataUtil.class.getSimpleName();
+    public static final String TAG = DataUtil.class.getSimpleName();
+    public static String string;
 
-    public static String[] formatstr;
-    public static String[] datas;
-    public static String[] times;
-
-    public DataUtil(){
-        java.util.Date date=new Date(System.currentTimeMillis());//获取当前时间
-        SimpleDateFormat format=new SimpleDateFormat();
-        String  string= format.format(date);
-        Log.i(TAG,"时间格式化的结果为："+string);
-
-        formatstr=string.split(" ");
-        datas=formatstr[0].split("/");
+    public DataUtil() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd");
+        string = format.format(new Date());
+        Log.i(TAG, "时间格式化的结果为：" + string);
     }
 
-    public static String getDate() {
-        StringBuilder data=new StringBuilder();
-        for (int i=0;i<data.length();i++){
-            data.append(datas[i]);
-        }
-
-        Log.i(TAG,"返回的日期值为："+data.toString());
-        return data.toString();
+    public static String getString() {
+        return string;
     }
 }

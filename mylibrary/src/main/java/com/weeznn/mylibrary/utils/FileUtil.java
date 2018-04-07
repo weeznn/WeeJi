@@ -52,7 +52,6 @@ public class FileUtil {
     }
     public static boolean makeDir(String type,String name) {
         String path = APPBASEPATH + type + "/"+ name;
-        Log.i(TAG,"makeDir :"+path);
         return makeDir(path);
     }
 
@@ -166,14 +165,34 @@ public class FileUtil {
      * @param data
      */
     public static void WriteText(String type, String fileName,int filetype ,String data) {
-        String path = APPBASEPATH + type + "/" + fileName + "/"+fileName;
+        String dirpath=APPBASEPATH + type + "/" +
+                fileName;
+        File filedir=new File(dirpath);
+        if (!filedir.exists()){
+            filedir.mkdir();
+        }
+
+        String path = dirpath + "/"+fileName;
         if (filetype==FILE_TYPE_JSON){
             path=path+TYPE_JSON;
         }else {
             path=path+TYPE_TEXT;
         }
 
+        File file=new File(path);
+        if (!file.exists()){
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         Log.i(TAG,"write text :"+path);
+
+        if (data==null){
+            data="";
+        }
         try {
             FileWriter fileWriter = new FileWriter(path);
             BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
@@ -198,32 +217,32 @@ public class FileUtil {
      * @throws FileNotFoundException
      */
     public static void WriteAudio(String type, String fileName, byte[] data, int length, int offset) throws FileNotFoundException {
-        String path=APPBASEPATH + type + "/" +
-                fileName + "/" +
+        String dirpath=APPBASEPATH + type + "/" +
+                fileName;
+
+        String path= dirpath+ "/" +
                 fileName + ".pcm";
         Log.i(TAG,"write  audio :"+path);
+        File filedir=new File(dirpath);
+        if (!filedir.exists()){
+            filedir.mkdir();
+        }
 
         File file = new File(path);
-        FileOutputStream stream = null;
-        if (!file.exists()) {
+        if (!file.exists()){
             try {
                 file.createNewFile();
-                stream = new FileOutputStream(file);
-                stream.write(data);
-                stream.flush();
-                stream.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else {
-            stream = new FileOutputStream(file, true);
-            try {
-                stream.write(data, offset, length);
-                stream.flush();
-                stream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        }
+        FileOutputStream stream = new FileOutputStream(file, true);
+        try {
+            stream.write(data, offset, length);
+            stream.flush();
+            stream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
     }
@@ -256,4 +275,17 @@ public class FileUtil {
         }
         return data;
     }
+
+
+    public static String getOutFile(String type,String name) {
+        //文件名格式 XXXX_XX_XX_未命名会议
+        if (!FileUtil.makeDir(type,name)) {
+            throw new RuntimeException("创建目录失败");
+        }
+        File file = new File(APPBASEPATH+type+"/"+name+"/"+name+"_out_file.pcm");
+
+        Log.i(TAG, "创建pcm临时文件 " + file.getAbsolutePath());
+        return file.getAbsolutePath();
+    }
+
 }

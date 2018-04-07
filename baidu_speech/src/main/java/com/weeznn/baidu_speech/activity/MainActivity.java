@@ -8,6 +8,7 @@ import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -17,11 +18,17 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.baidu.speech.EventManagerFactory;
+import com.weeznn.baidu_speech.MyApplication;
 import com.weeznn.baidu_speech.R;
 import com.weeznn.baidu_speech.imp.CONS;
 import com.weeznn.baidu_speech.online.BaiduAsr;
 import com.weeznn.baidu_speech.online.MicrophoneInputStream;
+import com.weeznn.mylibrary.utils.DataUtil;
 import com.weeznn.mylibrary.utils.FileUtil;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 
 public class MainActivity extends BaseActivity implements CONS, ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -36,6 +43,9 @@ public class MainActivity extends BaseActivity implements CONS, ActivityCompat.O
             Manifest.permission.RECORD_AUDIO
     };
     private static final int RADIO_PERMISSIONS_CODE = 1;
+    private static final int RESOULT_CODE_CANCEL=0;
+    private static final int RESOULT_CODE_DOWN=1;
+
     /**
      * 以下为View相关的控件和变量
      */
@@ -44,7 +54,8 @@ public class MainActivity extends BaseActivity implements CONS, ActivityCompat.O
     private FloatingActionButton down;
     private FloatingActionButton cancel;
     private Toolbar toolbar;
-    //Voice 的2个状态
+
+    //Voice 的3个状态
     private static final int VOICE_STATE_REDY = 0;
     private static final int VOICE_STATE_SPEAKING = 1;
     private static final int VOICE_STATE_PAUSE = 2;
@@ -53,10 +64,17 @@ public class MainActivity extends BaseActivity implements CONS, ActivityCompat.O
     /**
      * 以下为和逻辑相关的变量
      */
-    private String fileName = "";
-    private String fileType = FILE_TYPE_NOTE;
+    private String fileName;
+    private String fileType;
+    private String filesub;
+    private String peoples;
+    private String data;
+    private String[] keyWords=new String[3];
     private StringBuilder stringBuilder = new StringBuilder();
     private BaiduAsr asr;
+    //传回去的关于这个MEETING的信息。
+    private String[] stringArrayList=new String[9];
+    //private ArrayList<String> stringArrayList=new ArrayList<>();
 
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
@@ -74,10 +92,19 @@ public class MainActivity extends BaseActivity implements CONS, ActivityCompat.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initView();
         Intent intent = getIntent();
-        fileName = intent.getStringExtra(FILE_NAME_CODE);
-        fileType = intent.getStringExtra(FILE_TYPE_CODE);
+        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd");
+        data=simpleDateFormat.format(new Date());
+        fileName = data+"_"+intent.getStringExtra("title");
+        filesub=intent.getStringExtra("sub");
+        fileType = intent.getStringExtra("type");
+        peoples=intent.getStringExtra("peoples");
+
+        writePeoples2Storge(peoples);
+
+        Log.i(TAG,"title :"+fileName+"      sub :"+filesub+"    type  :"+fileType);
+
+        initView();
 
         int permission = ActivityCompat.checkSelfPermission(this, STORAGE_PERMISSIONS[1]);
         if (permission != PackageManager.PERMISSION_GRANTED) {
@@ -97,8 +124,20 @@ public class MainActivity extends BaseActivity implements CONS, ActivityCompat.O
                 .build();
     }
 
+    private void writePeoples2Storge(final String peoples) {
+        Log.i(TAG,"writePeoples2Storge data :"+peoples);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Log.i(TAG,"writing...");
+                FileUtil.WriteText(FileUtil.FILE_TYPE_MEETING,fileName,FileUtil.FILE_TYPE_JSON,peoples);
+            }
+        }).start();
+    }
+
     private void initView() {
         textView = findViewById(R.id.text);
+
         voice = findViewById(R.id.voice);
         down = findViewById(R.id.down);
         cancel = findViewById(R.id.cance);
@@ -106,24 +145,14 @@ public class MainActivity extends BaseActivity implements CONS, ActivityCompat.O
         voice.setOnClickListener(myClickListener);
         down.setOnClickListener(myClickListener);
         cancel.setOnClickListener(myClickListener);
+
         toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle(fileName);
         setSupportActionBar(toolbar);
-        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                // TODO: 2018/3/13
-                return true;
-            }
-        });
+        toolbar.setTitle(fileName);
+        toolbar.setTitleTextColor(getResources().getColor(R.color.colorWright));
+        toolbar.setSubtitle(filesub);
+        toolbar.setSubtitleTextColor(getResources().getColor(R.color.colorWright));
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_baidu_asr, menu);
-        return true;
-    }
-
 
     private class MyClickListener implements View.OnClickListener {
         @Override
@@ -135,18 +164,22 @@ public class MainActivity extends BaseActivity implements CONS, ActivityCompat.O
                         case VOICE_STATE_SPEAKING:
                             //说话中  要求暂停
                             Log.i(TAG, "voice 被点击 VOICE_STATE_SPEAKING 要求 暂停");
+                            voiceState = VOICE_STATE_PAUSE;
                             cancel.setVisibility(View.VISIBLE);
                             down.setVisibility(View.VISIBLE);
+                            voice.setImageResource(R.drawable.ic_mic_off);
                             asr.pause();
-                            voiceState = VOICE_STATE_PAUSE;
+
                             break;
                         case VOICE_STATE_PAUSE:
                             //暂停中  要求继续
                             Log.i(TAG, "voice 被点击 VOICE_STATE_PAUSE 要求继续");
+                            voiceState = VOICE_STATE_SPEAKING;
                             cancel.setVisibility(View.GONE);
                             down.setVisibility(View.GONE);
+                            voice.setImageResource(R.drawable.ic_microphone);
                             asr.start();
-                            voiceState = VOICE_STATE_SPEAKING;
+
                             break;
                         case VOICE_STATE_REDY:
                             //初始状态
@@ -159,21 +192,51 @@ public class MainActivity extends BaseActivity implements CONS, ActivityCompat.O
                             asr.start();
                             break;
                     }
+
                     break;
                 case R.id.cance:
                     //取消本次录音，将文件清除
                     Log.i(TAG, "click cance ,deleteFile");
                     asr.cancel();
                     FileUtil.deleteFile(fileType, fileName);
+                    // TODO: 2018/4/7 结束本activity前去判断是否写完了
+                    setResult(RESOULT_CODE_CANCEL);
+                    //finish();
                     break;
                 case R.id.down:
                     //已经完成录音，发送停止事件
                     Log.i(TAG, "click down ,writeFile");
                     asr.down();
-                    FileUtil.WriteText(fileType, fileName, stringBuilder.toString());
+                    //写文件
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            FileUtil.WriteText(fileType, fileName,FileUtil.FILE_TYPE_TEXT,stringBuilder.toString());
+                        }
+                    }).start();
+
+                    Bundle bundle=new Bundle();
+                    bundle.putString(getResources().getString(R.string.TABLE_MET_metID),""+(fileType+fileName).hashCode());
+                    bundle.putString(getResources().getString(R.string.TABLE_MET_time),data);
+                    bundle.putString(getResources().getString(R.string.TABLE_MET_title),fileName);
+                    bundle.putString(getResources().getString(R.string.TABLE_MET_sub),filesub);
+                    bundle.putString(getResources().getString(R.string.TABLE_MET_keyword1),keyWords[0]);
+                    bundle.putString(getResources().getString(R.string.TABLE_MET_keyword2),keyWords[1]);
+                    bundle.putString(getResources().getString(R.string.TABLE_MET_keyword3),keyWords[2]);
+                    Intent intent=new Intent();
+                    intent.putExtra("result",bundle);
+                    setResult(RESOULT_CODE_DOWN,intent);
+                    // TODO: 2018/4/7 结束本activity前去判断是否写完了
+                    //finish();
                     break;
             }
         }
     }
 
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Log.i(TAG,"onBackPressed");
+    }
 }

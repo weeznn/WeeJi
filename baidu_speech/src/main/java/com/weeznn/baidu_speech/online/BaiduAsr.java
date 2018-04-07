@@ -21,6 +21,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileNotFoundException;
 
+import static com.weeznn.mylibrary.utils.FileUtil.getOutFile;
+
 
 /**
  * Created by weeznn on 2018/3/12.
@@ -205,7 +207,7 @@ public class BaiduAsr implements CONS {
                 //行业
                 jsonObject.put(SpeechConstant.PROP, baiduAsr.sharedPreferences.getInt("porp", INPUT));
                 //保存识别过程产生的录音文件
-                jsonObject.put(SpeechConstant.OUT_FILE, getOutFile());
+                jsonObject.put(SpeechConstant.OUT_FILE, getOutFile(baiduAsr.fileType,baiduAsr.fileName));
                 //语音音频数据回调
                 jsonObject.put(SpeechConstant.ACCEPT_AUDIO_DATA, baiduAsr.sharedPreferences.getBoolean("audio",true));
                 //语音音量数据回调
@@ -220,27 +222,7 @@ public class BaiduAsr implements CONS {
             return baiduAsr;
         }
 
-        private String getOutFile() {
-            //文件名格式 XXXX_XX_XX_未命名会议
-            path = path + baiduAsr.fileType + "/" + baiduAsr.fileName + "/";
-            StringBuilder builder = new StringBuilder();
-            builder.append(DataUtil.getDate());
 
-            if (" ".equals(baiduAsr.fileName) || baiduAsr.fileName == null) {
-                builder.append("_未命名");
-            } else {
-                builder.append("_" + baiduAsr.fileName + "/");
-            }
-
-
-            if (!FileUtil.makeDir(path + builder.toString())) {
-                throw new RuntimeException("创建目录失败：" + path + builder.toString());
-            }
-            File file = new File(path + builder.toString() + "/out_file.pcm");
-
-            Log.i(TAG, "创建pcm临时文件 " + file.getAbsolutePath());
-            return file.getAbsolutePath();
-        }
 
     }
 
