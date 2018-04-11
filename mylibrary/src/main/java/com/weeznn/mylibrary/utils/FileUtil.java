@@ -33,8 +33,9 @@ public class FileUtil {
     public static final String FILE_TYPE_NOTE = "NOTE";
     public static final int FILE_TYPE_JSON = 1;
     public static final int FILE_TYPE_TEXT = 2;
-    private static final String TYPE_JSON = "_JSON.txt";
-    private static final String TYPE_TEXT = ".txt";
+    public static final String TYPE_JSON = "_JSON.txt";
+    public static final String TYPE_TEXT = ".txt";
+    public static final String TYPE_PCM = "out_file.pcm";
 
     /**
      * 创建文件夹
@@ -51,8 +52,17 @@ public class FileUtil {
         }
     }
     public static boolean makeDir(String type,String name) {
+        name=name.replace(" ","");
+        name.replace(" ","");
         String path = APPBASEPATH + type + "/"+ name;
         return makeDir(path);
+    }
+
+    public static String getPath(String type,String name,String fileType){
+        StringBuilder builder=new StringBuilder();
+        builder.append(APPBASEPATH);
+        builder.append(type+"/"+name+"/"+name+fileType);
+        return builder.toString();
     }
 
     /**
@@ -61,6 +71,7 @@ public class FileUtil {
      * @param name
      */
     public static void deleteFile(String type,String name){
+        name=name.replace(" ","");
         String path=APPBASEPATH+type+"/"+name;
         Log.i(TAG,"deleteFile :"+path);
         File file=new File(path);
@@ -134,6 +145,7 @@ public class FileUtil {
      * @return
      */
     public static String ReadText(String type, String fileName) {
+        fileName=fileName.replace(" ","");
         String path = APPBASEPATH + type + "/" + fileName + "/" + fileName + ".txt";
         Log.i(TAG,"read text :"+path);
         File file = new File(path);
@@ -165,6 +177,7 @@ public class FileUtil {
      * @param data
      */
     public static void WriteText(String type, String fileName,int filetype ,String data) {
+        fileName=fileName.replace(" ","");
         String dirpath=APPBASEPATH + type + "/" +
                 fileName;
         File filedir=new File(dirpath);
@@ -217,12 +230,13 @@ public class FileUtil {
      * @throws FileNotFoundException
      */
     public static void WriteAudio(String type, String fileName, byte[] data, int length, int offset) throws FileNotFoundException {
+        fileName=fileName.replace(" ","" );
         String dirpath=APPBASEPATH + type + "/" +
                 fileName;
 
         String path= dirpath+ "/" +
                 fileName + ".pcm";
-        Log.i(TAG,"write  audio :"+path);
+        //Log.i(TAG,"write  audio :"+path);
         File filedir=new File(dirpath);
         if (!filedir.exists()){
             filedir.mkdir();
@@ -278,6 +292,7 @@ public class FileUtil {
 
 
     public static String getOutFile(String type,String name) {
+        name=name.replace(" ","");
         //文件名格式 XXXX_XX_XX_未命名会议
         if (!FileUtil.makeDir(type,name)) {
             throw new RuntimeException("创建目录失败");

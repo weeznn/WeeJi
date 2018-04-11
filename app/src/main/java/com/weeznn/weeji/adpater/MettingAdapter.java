@@ -1,7 +1,9 @@
 package com.weeznn.weeji.adpater;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.constraint.ConstraintLayout;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -10,6 +12,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.weeznn.weeji.R;
+import com.weeznn.weeji.activity.DetailActivity;
+import com.weeznn.weeji.activity.MainActivity;
+import com.weeznn.weeji.interfaces.ItemClickListener;
 import com.weeznn.weeji.util.db.entry.Meeting;
 
 import java.util.ArrayList;
@@ -24,10 +29,14 @@ public class MettingAdapter extends RecyclerView.Adapter <MettingAdapter.Meeting
 
     private List<Meeting> data=new ArrayList<>();
     private LayoutInflater inflater;
+    private ItemClickListener listener;
 
     public MettingAdapter(Context context, List<Meeting> moduls){
         this.data= moduls;
         inflater=LayoutInflater.from(context);
+    }
+    public void setItemClickListener(ItemClickListener listener){
+        this.listener=listener;
     }
 
     @Override
@@ -37,7 +46,7 @@ public class MettingAdapter extends RecyclerView.Adapter <MettingAdapter.Meeting
     }
 
     @Override
-    public void onBindViewHolder(MeetingViewHolder holder, int position) {
+    public void onBindViewHolder(MeetingViewHolder holder, final int position) {
         Meeting meetingModul= data.get(position);
         holder.title.setText(meetingModul.getTitle());
         holder.sub.setText(meetingModul.getSub());
@@ -48,7 +57,7 @@ public class MettingAdapter extends RecyclerView.Adapter <MettingAdapter.Meeting
         holder.layout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                listener.onItemClick(position);
             }
         });
     }
@@ -66,7 +75,7 @@ public class MettingAdapter extends RecyclerView.Adapter <MettingAdapter.Meeting
         public TextView keyWord1;
         public TextView keyWord2;
         public TextView keyWord3;
-        public ConstraintLayout layout;
+        public CardView layout;
         public MeetingViewHolder(View itemView) {
             super(itemView);
             title=itemView.findViewById(R.id.title);
@@ -78,4 +87,5 @@ public class MettingAdapter extends RecyclerView.Adapter <MettingAdapter.Meeting
         }
 
     }
+
 }

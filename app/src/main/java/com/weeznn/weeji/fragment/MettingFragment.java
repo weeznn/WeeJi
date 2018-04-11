@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -23,9 +24,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.weeznn.mylibrary.utils.Constant;
 import com.weeznn.weeji.MyApplication;
 import com.weeznn.weeji.R;
+import com.weeznn.weeji.activity.DetailActivity;
 import com.weeznn.weeji.adpater.MettingAdapter;
+import com.weeznn.weeji.interfaces.ItemClickListener;
 import com.weeznn.weeji.util.db.MeetingDao;
 import com.weeznn.weeji.util.db.entry.Meeting;
 import com.weeznn.weeji.util.db.entry.People;
@@ -33,7 +37,10 @@ import com.weeznn.weeji.util.db.entry.People;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MettingFragment extends Fragment {
+public class MettingFragment extends Fragment
+        implements
+        Constant,
+        ItemClickListener {
     private static final String TAG=MettingFragment.class.getSimpleName();
     public static final String TAG_BACK="Metting";
 
@@ -71,10 +78,6 @@ public class MettingFragment extends Fragment {
     private void initdata() {
         data.add(new Meeting(111111,"2018/4/5","这是TITLE","asdfadf","adfasdfas","adfsfafd","dadfadsf","qwertytyuiodfghdal;kdsjfal;kdjf","mmm"));
         data.add(new Meeting(111111,"2018/4/5","这是TITLE","asdfadf","adfasdfas","adfsfafd","dadfadsf","qwertytyuiodfghdal;kdsjfal;kdjf","mmm"));
-        data.add(new Meeting(111111,"2018/4/5","这是TITLE","asdfadf","adfasdfas","adfsfafd","dadfadsf","qwertytyuiodfghdal;kdsjfal;kdjf","mmm"));
-        data.add(new Meeting(111111,"2018/4/5","这是TITLE","asdfadf","adfasdfas","adfsfafd","dadfadsf","qwertytyuiodfghdal;kdsjfal;kdjf","mmm"));
-        data.add(new Meeting(111111,"2018/4/5","这是TITLE","asdfadf","adfasdfas","adfsfafd","dadfadsf","qwertytyuiodfghdal;kdsjfal;kdjf","mmm"));
-        data.add(new Meeting(111111,"2018/4/5","这是TITLE","asdfadf","adfasdfas","adfsfafd","dadfadsf","qwertytyuiodfghdal;kdsjfal;kdjf","mmm"));
     }
 
 
@@ -108,7 +111,11 @@ public class MettingFragment extends Fragment {
         //recyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mettingAdapter=new MettingAdapter(getContext(),data);
+        mettingAdapter.setItemClickListener(this);
         recyclerView.setAdapter(mettingAdapter);
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
+
+
 
         //fab
         fab.setOnClickListener(new View.OnClickListener() {
@@ -147,7 +154,7 @@ public class MettingFragment extends Fragment {
                 List<Meeting>list=meetingDao.queryBuilder()
                         .limit(10)
                         .list();
-
+                Log.i(TAG,"DB query size:"+list.size());
                 data.addAll(list);
                 initdata();
                 Log.i(TAG,"onRefresh data size ="+data.size());
@@ -172,5 +179,22 @@ public class MettingFragment extends Fragment {
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         //super.onSaveInstanceState(outState);
+    }
+
+    /**
+     * 实现该接口，当item 被点击时跳转至DetailActivity；
+     * @param position
+     */
+    @Override
+    public void onItemClick(int position) {
+        Intent intent=new Intent(getActivity(), DetailActivity.class);
+        intent.putExtra(getString(R.string.LEFT_TYPE),CODE_MRT);
+        intent.putExtra(getString(R.string.LEFT_CODE),data.get(position).get_metID());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onItemLongClick(int position) {
+
     }
 }

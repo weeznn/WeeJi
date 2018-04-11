@@ -18,6 +18,11 @@ public class MyApplication extends Application {
     private static DaoSession daoSession;
     private static Context context;
     private static MyApplication myApplication;
+    //设备信息  屏幕
+    public static  float scale;
+    public static  float scaleDensity;
+
+
 
     public static MyApplication getApplication() {
         return myApplication;
@@ -29,6 +34,8 @@ public class MyApplication extends Application {
         context=getApplicationContext();
         myApplication=this;
         Log.i(TAG,"oncreat");
+        scale=getContext().getResources().getDisplayMetrics().density;
+        scaleDensity=getContext().getResources().getDisplayMetrics().scaledDensity;
         //配置数据库
         setupDataBase();
     }
@@ -44,4 +51,6 @@ public class MyApplication extends Application {
     public static DaoSession getInstant(){
         return daoSession;
     }
+
+    public static Context getContext(){return context;}
 }

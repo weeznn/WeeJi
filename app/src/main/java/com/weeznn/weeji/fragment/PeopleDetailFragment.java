@@ -107,6 +107,7 @@ public class PeopleDetailFragment extends Fragment {
         numberlistener=numberView.getKeyListener();
         numberView.setKeyListener(null);
 
+        fab=view.findViewById(R.id.fab);
         return view;
     }
 

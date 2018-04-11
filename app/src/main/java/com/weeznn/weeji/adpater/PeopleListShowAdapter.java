@@ -1,5 +1,6 @@
 package com.weeznn.weeji.adpater;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.weeznn.weeji.R;
+import com.weeznn.weeji.interfaces.ItemClickListener;
 import com.weeznn.weeji.util.db.entry.People;
 
 import java.util.ArrayList;
@@ -27,11 +29,16 @@ public class PeopleListShowAdapter extends RecyclerView.Adapter<PeopleListShowAd
 
     private List<People> data = new LinkedList<>();
     private LayoutInflater inflater;
+    private ItemClickListener listener;
 
     public PeopleListShowAdapter(Context contex, List<People> list) {
         Log.i(TAG,"PeopleListShowAdapter  data size "+list.size());
         this.inflater = LayoutInflater.from(contex);
         this.data = list;
+    }
+
+    public void setItemClickListener(ItemClickListener listener){
+        this.listener=listener;
     }
 
     @Override

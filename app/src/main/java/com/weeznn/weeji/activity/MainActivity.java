@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.weeznn.mylibrary.utils.Constant;
 import com.weeznn.weeji.MyApplication;
 import com.weeznn.weeji.R;
 import com.weeznn.weeji.fragment.DiaryFragment;
@@ -37,7 +38,9 @@ import com.weeznn.weeji.util.db.entry.Meeting;
 import com.weeznn.weeji.util.db.entry.Note;
 
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener ,
+        Constant{
     private static final String TAG = MainActivity.class.getSimpleName();
 
     //View
@@ -190,64 +193,76 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        final Bundle bundle = data.getBundleExtra("result");
-        switch (requestCode) {
-            case R.integer.REQUEST_CODE_MET:
-                if (resultCode == R.integer.RESOULT_CODE_DOWN) {
-                    MyApplication.getInstant().runInTx(new Runnable() {
-                        @Override
-                        public void run() {
-                            MeetingDao dao = MyApplication.getInstant().getMeetingDao();
-                            dao.insert(
-                                    new Meeting(Long.decode(bundle.getString(getResources().getString(R.string.TABLE_MET_metID),"未命名".hashCode()+"")),
-                                            bundle.getString(getResources().getString(R.string.TABLE_MET_time),""),
-                                            bundle.getString(getResources().getString(R.string.TABLE_MET_title),""),
-                                            bundle.getString(getResources().getString(R.string.TABLE_MET_sub),""),
-                                            bundle.getString(getResources().getString(R.string.TABLE_MET_keyword1),""),
-                                            bundle.getString(getResources().getString(R.string.TABLE_MET_keyword2),""),
-                                            bundle.getString(getResources().getString(R.string.TABLE_MET_keyword3),""),
-                                            bundle.getString(getResources().getString(R.string.TABLE_MET_address),""),
-                                            bundle.getString(getResources().getString(R.string.TABLE_MET_modetator),"")
-                                    ));
+        Log.i(TAG,"OnActivityResult  requestCode :"+requestCode+"   resultCode:"+resultCode);
+        if (data!=null){
+            final Bundle bundle = data.getBundleExtra("result");
+            if (null!=bundle){
+                switch (requestCode) {
+                    case REQUEST_CODE_MET:
+                        if (resultCode == RESOULT_CODE_DOWN) {
+                            MyApplication.getInstant().runInTx(new Runnable() {
+                                @Override
+                                public void run() {
+                                    MeetingDao dao = MyApplication.getInstant().getMeetingDao();
+                                    dao.insert(
+                                            new Meeting(
+                                                    Long.decode(bundle.getString(getResources().getString(R.string.TABLE_MET_metID),"未命名".hashCode()+"")),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_time),""),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_title),""),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_sub),""),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_keyword1),""),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_keyword2),""),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_keyword3),""),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_address),""),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_modetator),"")
+                                            ));
+                                }
+                            });
+                            Log.i(TAG,"meeting insert");
                         }
-                    });
-                }
-                break;
-            case R.integer.REQUEST_CODE_DIA:
-                if (resultCode == R.integer.RESOULT_CODE_DOWN) {
-                    MyApplication.getInstant().runInTx(new Runnable() {
-                        @Override
-                        public void run() {
-                            DiaryDao dao = MyApplication.getInstant().getDiaryDao();
-                            dao.insert(
-                                    new Diary(
-                                            bundle.getString(getResources().getString(R.string.TABLE_DAI_date),""),
-                                            bundle.getString(getResources().getString(R.string.TABLE_DAI_address),""),
-                                            bundle.getInt(getResources().getString(R.string.TABLE_DAI_mood),0)
-                                    ));
+                        break;
+                    case REQUEST_CODE_DIA:
+                        if (resultCode == RESOULT_CODE_DOWN) {
+                            MyApplication.getInstant().runInTx(new Runnable() {
+                                @Override
+                                public void run() {
+                                    DiaryDao dao = MyApplication.getInstant().getDiaryDao();
+                                    dao.insert(
+                                            new Diary(
+                                                    bundle.getString(getResources().getString(R.string.TABLE_DAI_date),""),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_DAI_address),""),
+                                                    bundle.getInt(getResources().getString(R.string.TABLE_DAI_mood),0)
+                                            ));
+                                }
+                            });
+                            Log.i(TAG,"meeting insert");
                         }
-                    });
-                }
-                break;
-            case R.integer.REQUEST_CODE_NOT:
-                if (resultCode == R.integer.RESOULT_CODE_DOWN) {
-                    MyApplication.getInstant().runInTx(new Runnable() {
-                        @Override
-                        public void run() {
-                            NoteDao dao = MyApplication.getInstant().getNoteDao();
-                            dao.insert(
-                                    new Note(
-                                            Long.decode(bundle.getString(getResources().getString(R.string.TABLE_NOT_noteID),"未命名".hashCode()+"")),
-                                            bundle.getString(getResources().getString(R.string.TABLE_NOT_time),""),
-                                            bundle.getString(getResources().getString(R.string.TABLE_NOT_cache),""),
-                                            bundle.getString(getResources().getString(R.string.TABLE_NOT_sub),""),
-                                            bundle.getInt(getResources().getString(R.string.TABLE_NOT_source),0)
-                                    ));
+                        break;
+                    case REQUEST_CODE_NOT:
+                        if (resultCode == RESOULT_CODE_DOWN) {
+                            MyApplication.getInstant().runInTx(new Runnable() {
+                                @Override
+                                public void run() {
+                                    NoteDao dao = MyApplication.getInstant().getNoteDao();
+                                    dao.insert(
+                                            new Note(
+                                                    Long.decode(bundle.getString(getResources().getString(R.string.TABLE_NOT_noteID),"未命名".hashCode()+"")),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_NOT_time),""),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_NOT_cache),""),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_NOT_sub),""),
+                                                    bundle.getInt(getResources().getString(R.string.TABLE_NOT_source),0)
+                                            ));
+                                }
+                            });
+                            Log.i(TAG,"meeting insert");
                         }
-                    });
+                        break;
                 }
-                break;
+            }
         }
-        Log.i(TAG,"OnActivityResult");
+
+        Fragment fragment=getSupportFragmentManager().findFragmentByTag(MettingFragment.TAG_BACK);
+        getSupportFragmentManager().popBackStack();
+        getSupportFragmentManager().beginTransaction().show(fragment).commit();
     }
 }

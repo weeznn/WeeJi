@@ -180,21 +180,9 @@
     <string name="LEFT_CODE">code</string>
 
 
-    <!--打开百度语音服务时的请求码 -->
-    <integer name="REQUEST_CODE_MET">0</integer>
-    <integer name="REQUEST_CODE_DIA">1</integer>
-    <integer name="REQUEST_CODE_NOT">2</integer>
+    <string name="speech_et_hint">点击开始录音！</string>
+    <string name="permission_title">权限申明</string>
+    <string name="permission_message">「WeeJi」的正常使用需要获取网络、磁盘、麦克风等权限！</string>
 
-    <!--百度语音服务的返回码 -->
-    <integer name="RESOULT_CODE_DOWN">1</integer>
-    <integer name="RESOULT_CODE_CANCEL">0</integer>
-
-    <!--CODE-->
-    <integer name="CODE_MRT">1</integer>
-    <integer name="CODE_DAI">2</integer>
-    <integer name="CODE_NOT">3</integer>
-
-    <dimen name="toolbarHeight">?attr/actionBarSize</dimen>
-    <dimen name="subScription_Head">240dp</dimen>
-
+    <string name="AUDIO_RESOULT_NOFILE">音频文件已被删除!</string>
 </resources>

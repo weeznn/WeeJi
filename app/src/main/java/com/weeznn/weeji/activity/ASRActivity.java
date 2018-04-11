@@ -1,38 +1,35 @@
-package com.weeznn.baidu_speech.activity;
+package com.weeznn.weeji.activity;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
 import com.baidu.speech.EventManagerFactory;
-import com.weeznn.baidu_speech.MyApplication;
-import com.weeznn.baidu_speech.R;
-import com.weeznn.baidu_speech.imp.CONS;
-import com.weeznn.baidu_speech.online.BaiduAsr;
-import com.weeznn.baidu_speech.online.MicrophoneInputStream;
-import com.weeznn.mylibrary.utils.DataUtil;
+import com.weeznn.mylibrary.utils.Constant;
 import com.weeznn.mylibrary.utils.FileUtil;
+import com.weeznn.weeji.util.baidu_speech.BaiduAsr;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 
-public class MainActivity extends BaseActivity implements CONS, ActivityCompat.OnRequestPermissionsResultCallback {
+import com.weeznn.weeji.R;
+import com.weeznn.weeji.util.baidu_speech.MicrophoneInputStream;
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+import static com.weeznn.mylibrary.utils.FileUtil.FILE_TYPE_MEETING;
+
+public class ASRActivity extends BaseActivity implements Constant,
+        ActivityCompat.OnRequestPermissionsResultCallback {
+
+    private static final String TAG = ASRActivity.class.getSimpleName();
 
     private static final String[] STORAGE_PERMISSIONS = new String[]{
             Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -72,16 +69,15 @@ public class MainActivity extends BaseActivity implements CONS, ActivityCompat.O
     private String[] keyWords=new String[3];
     private StringBuilder stringBuilder = new StringBuilder();
     private BaiduAsr asr;
-    //传回去的关于这个MEETING的信息。
-    private String[] stringArrayList=new String[9];
-    //private ArrayList<String> stringArrayList=new ArrayList<>();
 
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
-            if (msg.what == BaiduAsr.MSGCODE) {
+            if (msg.what == BaiduAsr.MSGCODE_FINAL) {
                 stringBuilder.append(msg.obj);
                 textView.setText(stringBuilder.toString());
+            }else if (msg.what==BaiduAsr.MSGCODE_PART){
+                textView.setText(stringBuilder.toString()+msg.obj);
             }
             return true;
         }
@@ -90,12 +86,12 @@ public class MainActivity extends BaseActivity implements CONS, ActivityCompat.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_asr);
 
         Intent intent = getIntent();
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd");
         data=simpleDateFormat.format(new Date());
-        fileName = data+"_"+intent.getStringExtra("title");
+        fileName =intent.getStringExtra("title");
         filesub=intent.getStringExtra("sub");
         fileType = intent.getStringExtra("type");
         peoples=intent.getStringExtra("peoples");
@@ -111,7 +107,7 @@ public class MainActivity extends BaseActivity implements CONS, ActivityCompat.O
             ActivityCompat.requestPermissions(this, STORAGE_PERMISSIONS, STORAGE_PERMISSIONS_CODE);
         }
         asr = new BaiduAsr.Builder()
-                .context(MainActivity.this)
+                .context(ASRActivity.this)
                 .audioData(false)
                 .audioVolince(false)
                 .fileName(fileName)
@@ -130,7 +126,7 @@ public class MainActivity extends BaseActivity implements CONS, ActivityCompat.O
             @Override
             public void run() {
                 Log.i(TAG,"writing...");
-                FileUtil.WriteText(FileUtil.FILE_TYPE_MEETING,fileName,FileUtil.FILE_TYPE_JSON,peoples);
+                FileUtil.WriteText(FILE_TYPE_MEETING,fileName,FileUtil.FILE_TYPE_JSON,peoples);
             }
         }).start();
     }
@@ -168,7 +164,7 @@ public class MainActivity extends BaseActivity implements CONS, ActivityCompat.O
                             cancel.setVisibility(View.VISIBLE);
                             down.setVisibility(View.VISIBLE);
                             voice.setImageResource(R.drawable.ic_mic_off);
-                            asr.pause();
+                            asr.stop();
 
                             break;
                         case VOICE_STATE_PAUSE:
@@ -185,9 +181,9 @@ public class MainActivity extends BaseActivity implements CONS, ActivityCompat.O
                             //初始状态
                             Log.i(TAG, "voice 被点击 VOICE_STATE_REDY ");
                             voiceState = VOICE_STATE_SPEAKING;
-                            int permission = ActivityCompat.checkSelfPermission(MainActivity.this, RADIO_PERMISSIONS[0]);
+                            int permission = ActivityCompat.checkSelfPermission(ASRActivity.this, RADIO_PERMISSIONS[0]);
                             if (permission != PackageManager.PERMISSION_GRANTED) {
-                                ActivityCompat.requestPermissions(MainActivity.this, RADIO_PERMISSIONS, RADIO_PERMISSIONS_CODE);
+                                ActivityCompat.requestPermissions(ASRActivity.this, RADIO_PERMISSIONS, RADIO_PERMISSIONS_CODE);
                             }
                             asr.start();
                             break;
@@ -201,12 +197,12 @@ public class MainActivity extends BaseActivity implements CONS, ActivityCompat.O
                     FileUtil.deleteFile(fileType, fileName);
                     // TODO: 2018/4/7 结束本activity前去判断是否写完了
                     setResult(RESOULT_CODE_CANCEL);
-                    //finish();
+                    finish();
                     break;
                 case R.id.down:
                     //已经完成录音，发送停止事件
-                    Log.i(TAG, "click down ,writeFile");
-                    asr.down();
+                    Log.i(TAG, "click stop ,writeFile");
+                    asr.stop();
                     //写文件
                     new Thread(new Runnable() {
                         @Override
@@ -227,7 +223,7 @@ public class MainActivity extends BaseActivity implements CONS, ActivityCompat.O
                     intent.putExtra("result",bundle);
                     setResult(RESOULT_CODE_DOWN,intent);
                     // TODO: 2018/4/7 结束本activity前去判断是否写完了
-                    //finish();
+                    finish();
                     break;
             }
         }

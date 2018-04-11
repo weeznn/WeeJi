@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.weeznn.weeji.R;
+import com.weeznn.weeji.interfaces.ItemClickListener;
 import com.weeznn.weeji.util.db.entry.Diary;
 
 import java.util.ArrayList;
@@ -23,10 +24,15 @@ public class DiaryAdapter extends RecyclerView.Adapter<DiaryAdapter.DiaryViewHol
     private Context context;
     private LayoutInflater inflater;
     private List<Diary> data=new ArrayList<>();
+    private ItemClickListener listener;
 
     public DiaryAdapter(Context context, List<Diary> list){
         this.context=context;
         this.data=list;
+    }
+
+    public void setOnItemClickListener(ItemClickListener listener){
+        this.listener=listener;
     }
 
     @Override

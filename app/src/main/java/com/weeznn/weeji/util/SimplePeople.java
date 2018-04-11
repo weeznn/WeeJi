@@ -47,12 +47,6 @@ public class SimplePeople {
             Log.i(TAG,"list  size "+list.size());
         }
 
-        // TODO: 2018/4/5 测试数据，记得删除
-        list.add(new SimplePeople("qqqqqq","","qqqqqq","qqqqqqqqq"));
-        list.add(new SimplePeople("qqqqqq","","qqqqqq","qqqqqqqqq"));
-        list.add(new SimplePeople("qqqqqq","","qqqqqq","qqqqqqqqq"));
-        list.add(new SimplePeople("qqqqqq","","qqqqqq","qqqqqqqqq"));
-
         return list;
     }
 

@@ -6,21 +6,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/drawerLayout"
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start"
     tools:context="com.weeznn.weeji.activity.DetailActivity">
 
     <FrameLayout
         android:id="@+id/frameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-
-    <android.support.design.widget.NavigationView
-        android:id="@+id/nav_view"
-        app:headerLayout="@layout/nav_headler_detail"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_gravity="start"
+        android:background="@color/colorWright"
+        android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:scaleType="centerCrop"
+            android:layout_height="0dp" />
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"/>
-    </android.support.design.widget.NavigationView>
+            android:layout_width="match_parent"
+            android:layout_weight="3"
+            android:layout_height="0dp"/>
+    </LinearLayout>
+
 </android.support.v4.widget.DrawerLayout>

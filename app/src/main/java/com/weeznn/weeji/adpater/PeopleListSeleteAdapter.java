@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.weeznn.weeji.R;
+import com.weeznn.weeji.interfaces.ItemClickListener;
 import com.weeznn.weeji.util.SimplePeople;
 import com.weeznn.weeji.util.db.entry.People;
 
@@ -33,6 +34,11 @@ public class PeopleListSeleteAdapter extends RecyclerView.Adapter<PeopleListSele
     private List<People> data=new LinkedList<>();
     private List<SimplePeople> simplePeopleList=new LinkedList<>();
     private LayoutInflater inflater;
+    private ItemClickListener listener;
+
+    public void setItemClickListener(ItemClickListener listener){
+        this.listener=listener;
+    }
 
     public PeopleListSeleteAdapter(Context context,List<People> peopleList,List<SimplePeople>simplePeople){
         Log.i(TAG,"PeopleListSeleteAdapter  people List Size : "+peopleList.size()+"   simple people list size "+simplePeople.size());

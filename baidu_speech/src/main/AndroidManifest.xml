@@ -32,7 +32,7 @@
             android:exported="false" />
 
         <activity android:name=".activity.Baidu_ASR" />
-        <activity android:name=".activity.MainActivity">
+        <activity android:name=".activity.ASRActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

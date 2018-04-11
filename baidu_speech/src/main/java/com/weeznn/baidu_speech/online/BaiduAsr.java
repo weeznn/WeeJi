@@ -96,6 +96,13 @@ public class BaiduAsr implements CONS {
         Log.i(TAG,"pause");
         microphoneInputStream.pause();
     }
+    /**
+     * 重启
+     */
+    public void reStart(){
+        Log.i(TAG,"restart");
+        microphoneInputStream.start();
+    }
 
     /**
      * 取消本次识别，将path目录下的数据清除
@@ -286,7 +293,7 @@ public class BaiduAsr implements CONS {
                     break;
                 case SpeechConstant.CALLBACK_EVENT_ASR_AUDIO:
                     //语音音频数据回调
-                    Log.i(TAG, "语音音频数据回调   size "+i);
+                    //Log.i(TAG, "语音音频数据回调   size "+i);
                     try {
                         FileUtil.WriteAudio(fileType, fileName, bytes, i1, i);
                     } catch (FileNotFoundException e) {

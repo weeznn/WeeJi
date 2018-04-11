@@ -1,6 +1,9 @@
 package com.weeznn.weeji.fragment;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,88 +14,80 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toolbar;
 
 import com.weeznn.mylibrary.utils.FileUtil;
 import com.weeznn.weeji.MyApplication;
 import com.weeznn.weeji.R;
-import com.weeznn.weeji.adpater.DetailAdapter;
+import com.weeznn.weeji.activity.DetailActivity;
+import com.weeznn.weeji.interfaces.UpdataFragmentDetailListener;
+import com.weeznn.weeji.service.AudioIntentService;
 import com.weeznn.weeji.util.db.MeetingDao;
 import com.weeznn.weeji.util.db.entry.Meeting;
-import com.weeznn.weeji.util.db.entry.People;
 
 import java.util.List;
 
-
-public class MeetingDetailFragment extends Fragment implements DetailAdapter.UpdateFragmentDetail {
+public class MeetingDetailFragment extends Fragment implements View.OnClickListener {
     private static final String TAG = "MeetingDetailFragment";
-    private static final String MEETING_CODE = "CODE";
 
-    private String code;
-    private String title;
-    private String sub;
-    private String keyWard1;
-    private String keyWard2;
-    private String keyWard3;
-    private String path;
-    private String text;
+    private static final String ARG_PARAM1 = "CODE";
+    private static final int MSG_CODE_METTING_DB = 1;
+    private static final int MSG_CODE_METTING_UPDATA = 2;
+    private static final int MSG_CODE_METTING_FILE = 3;
 
-    private OnFragmentInteractionListener mListener;
-
-    public MeetingDetailFragment() {
-        // Required empty public constructor
-    }
+    private static final int PLAYER_START = 1;
+    private static final int PLAYER_PAUSE = 2;
 
 
     //view
-    private Toolbar toolbar;
-    private CollapsingToolbarLayout collapsingToolbarLayout;
     private AppBarLayout appBarLayout;
+    private FloatingActionButton player;
+    private ProgressBar progressBar;
+
     private TextView titleView;
-    private TextView subView;
+    private TextView timeView;
+    private TextView addrView;
     private TextView keyWord1View;
     private TextView keyWord2View;
     private TextView keyWord3View;
     private TextView textView;
-    private FloatingActionButton player;
+    private ImageButton btnPlayer;
+    private TextView toolbarTitle;
+
+
+    //逻辑
+    private long code;
+    private Meeting meeting;
+    private String txt;//正文
+    private int playerState = PLAYER_PAUSE;
+
+    private OnFragmentInteractionListener mListener;
+
+    private LocalBroadcastManager localBroadcastManager;
+    private MyAudioProgressResiver resiver;
+
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
-            titleView.setText(title);
-            subView.setText(sub);
-            keyWord1View.setText(keyWard1);
-            keyWord2View.setText(keyWard2);
-            keyWord3View.setText(keyWard3);
-            textView.setText(text);
+            onHandleMessage(msg);
             return true;
         }
     });
 
-
-    private final float screenW = getResources().getDisplayMetrics().widthPixels;
-    private final float toolBarHeight = getResources().getDimension(R.dimen.toolbarHeight);
-    private final float initHeight = getResources().getDimension(R.dimen.subScription_Head);
-    private float titleOffset;
-    private float subOffset;
-    private float keyWordOffset;
-    private float mHeight = 0;
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment MeetingDetailFragment.
-     */
-    public static MeetingDetailFragment newInstance(String code) {
+    public static MeetingDetailFragment newInstance(long code) {
         MeetingDetailFragment fragment = new MeetingDetailFragment();
         Bundle args = new Bundle();
-        args.putString(MEETING_CODE, code);
+        args.putLong(ARG_PARAM1, code);
         fragment.setArguments(args);
         return fragment;
     }
@@ -101,30 +96,24 @@ public class MeetingDetailFragment extends Fragment implements DetailAdapter.Upd
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            code = getArguments().getString(MEETING_CODE);
-            initdata(code);
+            code = getArguments().getLong(ARG_PARAM1);
+            initInfo();
         }
-    }
+        localBroadcastManager = LocalBroadcastManager.getInstance(getContext());
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(AudioIntentService.ACTION_AUDIO_PRO);
+        resiver = new MyAudioProgressResiver();
+        localBroadcastManager.registerReceiver(resiver, filter);
 
-    private void initdata(final String code) {
-        MyApplication.getInstant().runInTx(new Runnable() {
+        ((DetailActivity) getActivity()).setFragmentDetailListener(new UpdataFragmentDetailListener() {
             @Override
-            public void run() {
-                List<Meeting> list = MyApplication.getInstant().getMeetingDao().queryBuilder()
-                        .where(MeetingDao.Properties._metID.eq(code))
-                        .list();
-                Log.i(TAG, "GET  INFO :" + list.get(0).toString());
-
-                title = list.get(0).getTitle();
-                sub = list.get(0).getSub();
-                keyWard1 = list.get(0).getKeyword1();
-                keyWard2 = list.get(0).getKeyword2();
-                keyWard3 = list.get(0).getKeyword3();
-                text = FileUtil.ReadText(FileUtil.FILE_TYPE_MEETING, list.get(0).getTitle());
-                handler.sendMessage(new Message());
+            public void updata(long code) {
+                Message message=new Message();
+                message.what=MSG_CODE_METTING_UPDATA;
+                message.obj=code;
+               handler.sendMessage(message);
             }
         });
-
 
     }
 
@@ -132,29 +121,36 @@ public class MeetingDetailFragment extends Fragment implements DetailAdapter.Upd
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_meeting_detail, container, false);
-        toolbar = view.findViewById(R.id.toolbar);
-        collapsingToolbarLayout = view.findViewById(R.id.collapsingToolbar);
+        appBarLayout = view.findViewById(R.id.appbar);
+        player = view.findViewById(R.id.fab);
+        progressBar = view.findViewById(R.id.progressbar);
+
         titleView = view.findViewById(R.id.title);
-        subView = view.findViewById(R.id.subtext);
-        textView = view.findViewById(R.id.textView);
+        timeView = view.findViewById(R.id.time);
+        addrView = view.findViewById(R.id.address);
         keyWord1View = view.findViewById(R.id.key_word_1);
         keyWord2View = view.findViewById(R.id.key_word_2);
         keyWord3View = view.findViewById(R.id.key_word_3);
-        appBarLayout = view.findViewById(R.id.appbar);
-        player=view.findViewById(R.id.player);
+        textView = view.findViewById(R.id.text);
+        btnPlayer = view.findViewById(R.id.btn_player);
+        toolbarTitle = view.findViewById(R.id.toolbar_title);
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        appBarLayout.addOnOffsetChangedListener(new MyAppBarStateChangeListener());
-        // TODO: 2018/4/7
+        //player
+        player.setOnClickListener(this);
+        btnPlayer.setOnClickListener(this);
+
+        //appbar
+        appBarLayout.addOnOffsetChangedListener(new MyOffsetChangeListener());
 
     }
 
     // TODO: Rename method, update argument and hook method into UI event
-    public void upDataTableMET(Uri uri) {
+    public void onButtonPressed(Uri uri) {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
@@ -175,83 +171,140 @@ public class MeetingDetailFragment extends Fragment implements DetailAdapter.Upd
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        localBroadcastManager.unregisterReceiver(resiver);
     }
 
     @Override
-    public void update(String code) {
-        initdata(code);
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.btn_player:
+            case R.id.fab:
+                if (playerState == PLAYER_PAUSE) {
+                    Log.i(TAG, "开始播放");
+                    playerState = PLAYER_START;
+                    player.setImageResource(R.drawable.ic_play_arrow_black_24dp);
+                    btnPlayer.setImageResource(R.drawable.ic_play_arrow_black_24dp);
+                    player.invalidate();
+                    btnPlayer.invalidate();
+                } else {
+                    Log.i(TAG, "暂停播放");
+                    playerState = PLAYER_PAUSE;
+                    player.setImageResource(R.drawable.ic_pause_black_24dp);
+                    btnPlayer.setImageResource(R.drawable.ic_pause_black_24dp);
+                    player.invalidate();
+                    btnPlayer.invalidate();
+                }
+                break;
+        }
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
 
-    /**
-     * Appbarlayout listener
-     */
-    private class MyAppBarStateChangeListener implements AppBarLayout.OnOffsetChangedListener {
-        private static final String TAG = "AppBarState";
-
-        @Override
-        public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-
-            if (mHeight == 0) {
-                mHeight = titleView.getHeight();
-                float titleDiatance = titleView.getTop() + (mHeight - toolBarHeight) / 2;
-                float subDistance = subView.getTop() - toolBarHeight;
-                float keyWordDistance = keyWord1View.getBottom() - toolBarHeight;
-                titleOffset = titleDiatance / (initHeight - toolBarHeight);
-                subOffset = subDistance / (initHeight - toolBarHeight);
-                keyWordOffset = keyWordDistance / (initHeight - toolBarHeight);
-            }
-
-            titleView.setTranslationY(titleOffset * verticalOffset);
-            subView.setAlpha(subOffset * verticalOffset);
-            player.setScaleX(keyWordOffset*verticalOffset);
-            player.setScaleY(keyWordOffset*verticalOffset);
-            keyWord1View.setTranslationY(keyWordOffset * verticalOffset);
+    private void onHandleMessage(Message msg) {
+        switch (msg.what) {
+            case MSG_CODE_METTING_DB:
+                //读文件
+                readText(meeting.getTitle());
+                titleView.setText(meeting.getTitle());
+                timeView.setText(meeting.getTime());
+                addrView.setText(meeting.getAddress());
+                keyWord1View.setText(meeting.getKeyword1());
+                keyWord2View.setText(meeting.getKeyword2());
+                keyWord3View.setText(meeting.getKeyword3());
+                toolbarTitle.setText(meeting.getTitle());
+                break;
+            case MSG_CODE_METTING_FILE:
+                textView.setText(txt);
+                break;
+            case MSG_CODE_METTING_UPDATA:
+                code= (long) msg.obj;
+                initInfo();
         }
     }
 
+    /**
+     * 从数据库中读取该meeting 的信息
+     */
+    private void initInfo() {
+        MyApplication.getInstant().runInTx(new Runnable() {
+            @Override
+            public void run() {
+                List<Meeting> resule = MyApplication.getInstant().getMeetingDao().queryBuilder()
+                        .where(MeetingDao.Properties._metID.eq(code))
+                        .list();
+                if (resule != null && resule.size() > 0) {
+                    meeting = resule.get(0);
+                    handler.sendEmptyMessage(MSG_CODE_METTING_DB);
+                }
+            }
+        });
+    }
 
-//    private abstract static class AppBarStateChangeListener implements AppBarLayout.OnOffsetChangedListener{
-//        public enum State{
-//            EXPANDED,
-//            COLLAPSED,
-//            IDLE
-//        }
-//        private State currentState=State.IDLE;
-//
-//        @Override
-//        public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-//            if (0==verticalOffset){
-//                if (currentState!=State.EXPANDED){
-//                    onStateChanged(appBarLayout,State.EXPANDED,verticalOffset);
-//                }
-//                currentState=State.EXPANDED;
-//            }else if (Math.abs(verticalOffset)>=appBarLayout.getTotalScrollRange()){
-//                if (currentState!=State.COLLAPSED){
-//                    onStateChanged(appBarLayout,State.COLLAPSED,verticalOffset);
-//                }
-//                currentState=State.COLLAPSED;
-//            }else{
-//                if (currentState!=State.IDLE){
-//                    onStateChanged(appBarLayout,State.IDLE,verticalOffset);
-//                }
-//                currentState=State.IDLE;
-//            }
-//        }
-//        public abstract void onStateChanged(AppBarLayout appBarLayout,State state,int verticalOffset);
-//    }
+    /**
+     * 从本地读取文本文件
+     *
+     * @param fileName
+     */
+    private void readText(final String fileName) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                txt = FileUtil.ReadText(FileUtil.FILE_TYPE_MEETING, fileName);
+                handler.sendEmptyMessage(MSG_CODE_METTING_FILE);
+            }
+        }).start();
+
+    }
+
+    /**
+     * 滑动折叠监听器
+     */
+    private class MyOffsetChangeListener implements AppBarLayout.OnOffsetChangedListener {
+        private final int EXPAND = 1;
+        private final int CLOOSE = 2;
+        private final int IDEO = 3;
+        private int currontState = IDEO;
+
+        @Override
+        public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+            if (verticalOffset == 0) {
+                if (currontState != EXPAND) {
+                    currontState = EXPAND;
+                    //展开状态  toolbar 不显示 fab显示
+                }
+                btnPlayer.setVisibility(View.GONE);
+                toolbarTitle.setVisibility(View.GONE);
+
+                player.setVisibility(View.VISIBLE);
+            } else if (Math.abs(verticalOffset) >= appBarLayout.getTotalScrollRange()) {
+                if (currontState != CLOOSE) {
+                    currontState = CLOOSE;
+                }
+                //闭合状态  toolbar显示  其他的不显示
+                btnPlayer.setVisibility(View.VISIBLE);
+                toolbarTitle.setVisibility(View.VISIBLE);
+
+                player.setVisibility(View.INVISIBLE);
+            } else {
+                currontState = IDEO;
+                toolbarTitle.setVisibility(View.GONE);
+                btnPlayer.setVisibility(View.INVISIBLE);
+
+            }
+        }
+    }
+
+    /**
+     * 广播接收器  接收音频播放的进度条消息
+     */
+    private class MyAudioProgressResiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //填写进度条
+            progressBar.setProgress(intent.getIntExtra(AudioIntentService.AUDIO_PROGRESS, 0));
+        }
+    }
 }

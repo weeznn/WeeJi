@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.weeznn.weeji.R;
+import com.weeznn.weeji.interfaces.ItemClickListener;
 import com.weeznn.weeji.util.db.entry.Note;
 
 import java.util.List;
@@ -21,12 +22,14 @@ import java.util.List;
 public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder> {
     private List<Note> data;
     private LayoutInflater inflater;
-
+    private ItemClickListener listener;
     public NoteAdapter(Context context, List<Note> list) {
         this.data = list;
         this.inflater = LayoutInflater.from(context);
     }
-
+    public void setItemClickListener(ItemClickListener listener){
+        this.listener=listener;
+    }
 
     @Override
     public NoteViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {

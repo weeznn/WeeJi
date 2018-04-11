@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView
+    android:id="@+id/layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    app:cardCornerRadius="2dp">
+    android:layout_height="wrap_content">
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -11,6 +12,7 @@
 
         <TextView
             android:id="@+id/title"
+            android:text="@string/app_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
@@ -21,23 +23,25 @@
 
         <TextView
             android:id="@+id/subtext"
-            android:layout_width="368dp"
+            android:text="@string/about_app"
+            android:layout_below="@+id/key_word_1"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/title"
             android:lineSpacingExtra="5dp"
-            android:lines="3"
+           android:maxLines="2"
+           android:ellipsize="end"
             android:padding="16dp"
             android:textSize="14sp" />
 
         <TextView
             android:id="@+id/key_word_1"
+            style="@style/KeyWord"
+            android:text="@string/app_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_below="@id/subtext"
-            android:layout_marginBottom="16dp"
+            android:layout_below="@id/title"
             android:layout_marginLeft="32dp"
-            android:background="@drawable/key_word"
             android:paddingBottom="6dp"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
@@ -45,12 +49,13 @@
 
         <TextView
             android:id="@+id/key_word_2"
+            style="@style/KeyWord"
+            android:text="@string/app_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/subtext"
-            android:layout_marginLeft="4dp"
+            android:layout_below="@id/title"
+            android:layout_marginLeft="8dp"
             android:layout_toRightOf="@id/key_word_1"
-            android:background="@drawable/key_word"
             android:paddingBottom="6dp"
             android:paddingLeft="6dp"
             android:paddingRight="8dp"
@@ -58,12 +63,13 @@
 
         <TextView
             android:id="@+id/key_word_3"
+            style="@style/KeyWord"
+            android:text="@string/app_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/subtext"
-            android:layout_marginLeft="4dp"
+            android:layout_below="@id/title"
+            android:layout_marginLeft="8dp"
             android:layout_toRightOf="@+id/key_word_2"
-            android:background="@drawable/key_word"
             android:paddingBottom="6dp"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"

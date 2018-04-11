@@ -14,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -30,8 +31,10 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
+import com.weeznn.mylibrary.utils.Constant;
 import com.weeznn.mylibrary.utils.FileUtil;
 import com.weeznn.weeji.R;
+import com.weeznn.weeji.activity.ASRActivity;
 import com.weeznn.weeji.util.SimplePeople;
 import com.weeznn.weeji.util.db.entry.People;
 
@@ -42,7 +45,7 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MeetingPreEditFragment extends Fragment {
+public class MeetingPreEditFragment extends Fragment implements Constant{
     private static final String TAG = MeetingPreEditFragment.class.getSimpleName();
     public static final String TAG_BACK = "MeetingPreEdit";
     public static final String FLAG_PEOPLES = "peoples";
@@ -130,6 +133,7 @@ public class MeetingPreEditFragment extends Fragment {
         //recyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(new PreEditAdapter(getContext(), list));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
 
         //toolbar
         // TODO: 2018/4/4 有时间升级
@@ -171,19 +175,20 @@ public class MeetingPreEditFragment extends Fragment {
         if (item.getItemId()==R.id.yes){
             String json=SimplePeople.list2String(list);
             //转到百度语音
-            Intent intent=getActivity().getPackageManager().getLaunchIntentForPackage(getString(R.string.BAIDU_ASR_PACKAGE_NAME));
+            Intent intent=new Intent(getActivity(), ASRActivity.class);
             if (intent!=null){
                 Log.i(TAG,"GO TO BAIDU ASR");
                 intent.putExtra("title",titleView.getText().toString());
                 intent.putExtra("sub",subView.getText().toString());
                 intent.putExtra("type",FileUtil.FILE_TYPE_MEETING);
                 intent.putExtra("peoples",json);
-                startActivityForResult(intent,R.integer.REQUEST_CODE_MET);
+
+                getActivity().startActivityForResult(intent,REQUEST_CODE_MET);
             }
 
             Log.i(TAG,"PRE EDIT DOWN");
         }
-        return super.onOptionsItemSelected(item);
+        return true;
     }
 
 

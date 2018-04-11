@@ -45,4 +45,5 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
     compile 'org.greenrobot:greendao:3.2.2'
     implementation project(':mylibrary')
+    implementation files('libs/bdasr_V3_20171108_9800a2a.jar')
 }
