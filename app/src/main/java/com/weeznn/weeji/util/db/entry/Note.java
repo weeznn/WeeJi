@@ -5,7 +5,7 @@ import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
 
 /**
- * Created by weeznn on 2018/3/30.
+ * Created by weeznn on 2018/4/12.
  */
 
 @Entity
@@ -13,14 +13,15 @@ public class Note {
     @Id
     private long _noteID;
     private String time;
-    private String cache;
+    private String image;
     private String sub;
-    private int source;
-    @Generated(hash = 1463841500)
-    public Note(long _noteID, String time, String cache, String sub, int source) {
+    private String source;
+    @Generated(hash = 715076257)
+    public Note(long _noteID, String time, String image, String sub,
+            String source) {
         this._noteID = _noteID;
         this.time = time;
-        this.cache = cache;
+        this.image = image;
         this.sub = sub;
         this.source = source;
     }
@@ -39,11 +40,11 @@ public class Note {
     public void setTime(String time) {
         this.time = time;
     }
-    public String getCache() {
-        return this.cache;
+    public String getImage() {
+        return this.image;
     }
-    public void setCache(String cache) {
-        this.cache = cache;
+    public void setImage(String image) {
+        this.image = image;
     }
     public String getSub() {
         return this.sub;
@@ -51,11 +52,10 @@ public class Note {
     public void setSub(String sub) {
         this.sub = sub;
     }
-    public int getSource() {
+    public String getSource() {
         return this.source;
     }
-    public void setSource(int source) {
+    public void setSource(String source) {
         this.source = source;
     }
-
 }

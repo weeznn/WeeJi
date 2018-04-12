@@ -9,19 +9,18 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.Fragment;
 import android.text.method.KeyListener;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.weeznn.weeji.MyApplication;
 import com.weeznn.weeji.R;
 import com.weeznn.weeji.util.db.PeopleDao;
 import com.weeznn.weeji.util.db.entry.People;
-
-import org.greenrobot.greendao.query.WhereCondition;
-import org.json.JSONObject;
 
 public class PeopleDetailFragment extends Fragment {
     public static final String TAG = PeopleDetailFragment.class.getSimpleName();
@@ -59,6 +58,7 @@ public class PeopleDetailFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(TAG,"onCreate");
         if (getArguments()==null){
             isSelf=true;
             SharedPreferences sharedPreferences=getActivity().getSharedPreferences(getString(R.string.SharedPreferences_name),0);
@@ -115,8 +115,11 @@ public class PeopleDetailFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+//        RequestOptions options=new RequestOptions();
+//        options.error(R.drawable.ic_user_black);
         Glide.with(photoView)
-                .load(photo);
+                .load(photo)
+                .into(photoView);
 
         nameView.setText(name);
         numberView.setText(number);
@@ -129,10 +132,12 @@ public class PeopleDetailFragment extends Fragment {
             public void onClick(View v) {
                 if (FAB_EDIT==fabState){
                     //编辑
+                    fab.setImageResource(R.drawable.ic_yes);
                     edit();
                 }else {
                     //编辑完毕
                     down();
+                    fab.setImageResource(R.drawable.ic_edit);
                 }
             }
         });
@@ -173,7 +178,6 @@ public class PeopleDetailFragment extends Fragment {
             }
         }
         fabState=FAB_EDIT;
-        changeFABState();
 
         getActivity().getSupportFragmentManager().beginTransaction()
                 .remove(this);
@@ -181,24 +185,12 @@ public class PeopleDetailFragment extends Fragment {
 
     private void edit() {
         fabState=FAB_DOWN;
-        changeFABState();
 
         nameView.setKeyListener(namelistener);
         numberView.setKeyListener(numberlistener);
         emailView.setKeyListener(emaillistener);
         companyView.setKeyListener(companylistener);
         jobView.setKeyListener(joblistener);
-
-
     }
-
-    private void changeFABState() {
-        if (fabState==FAB_EDIT){
-            fab.setBackgroundResource(R.drawable.ic_edit);
-        }else {
-            fab.setBackgroundResource(R.drawable.ic_yes);
-        }
-    }
-
 
 }

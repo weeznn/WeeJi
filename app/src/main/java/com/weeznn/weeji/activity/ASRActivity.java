@@ -91,7 +91,7 @@ public class ASRActivity extends BaseActivity implements Constant,
         Intent intent = getIntent();
         SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd");
         data=simpleDateFormat.format(new Date());
-        fileName =intent.getStringExtra("title");
+        fileName =data+"|"+intent.getStringExtra("title");
         filesub=intent.getStringExtra("sub");
         fileType = intent.getStringExtra("type");
         peoples=intent.getStringExtra("peoples");

@@ -1,6 +1,7 @@
 package com.weeznn.weeji.adpater;
 
 import android.content.Context;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.weeznn.weeji.R;
+import com.weeznn.weeji.fragment.NoteFragment;
 import com.weeznn.weeji.interfaces.ItemClickListener;
 import com.weeznn.weeji.util.db.entry.Note;
 
@@ -27,6 +29,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         this.data = list;
         this.inflater = LayoutInflater.from(context);
     }
+
     public void setItemClickListener(ItemClickListener listener){
         this.listener=listener;
     }
@@ -38,7 +41,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
     }
 
     @Override
-    public void onBindViewHolder(NoteViewHolder holder, int position) {
+    public void onBindViewHolder(NoteViewHolder holder, final int position) {
         Note item = data.get(position);
         holder.count.setText((item.get_noteID() + 1) + "条");
         holder.subtext.setText(item.getSub());
@@ -46,8 +49,15 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
 
         // TODO: 2018/3/30 去判断是否缓存了图片，如果缓存就从本地读，不缓存就从链接读
         Glide.with(holder.imageView)
-                .load(item.getCache())
+                .load(item.getImage())
                 .into(holder.imageView);
+
+        holder.cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onItemClick(position);
+            }
+        });
     }
 
 
@@ -64,6 +74,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
         public TextView subtext;
         public TextView count;
         public TextView title;
+        private CardView cardView;
 
         public NoteViewHolder(View itemView) {
             super(itemView);
@@ -71,6 +82,7 @@ public class NoteAdapter extends RecyclerView.Adapter<NoteAdapter.NoteViewHolder
             subtext = itemView.findViewById(R.id.subtext);
             count = itemView.findViewById(R.id.num);
             title = itemView.findViewById(R.id.source);
+            cardView=itemView.findViewById(R.id.card);
         }
     }
 

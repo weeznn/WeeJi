@@ -12,7 +12,9 @@ import android.widget.TextView;
 import com.weeznn.mylibrary.utils.Constant;
 import com.weeznn.weeji.R;
 import com.weeznn.weeji.interfaces.ItemClickListener;
+import com.weeznn.weeji.util.db.entry.Diary;
 import com.weeznn.weeji.util.db.entry.Meeting;
+import com.weeznn.weeji.util.db.entry.Note;
 
 import java.util.List;
 
@@ -49,7 +51,21 @@ public class DetailAdapter extends RecyclerView.Adapter<DetailAdapter.DetailView
     public void onBindViewHolder(DetailViewHolder holder, final int position) {
         switch (type){
             case CODE_DAI:
+                holder.textView.setText(((Diary)(data.get(position))).getDate());
+                holder.layout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        listener.onItemClick(position);
+                    }
+                });
             case CODE_NOT:
+                holder.textView.setText(((Note)(data.get(position))).getSource());
+                holder.layout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        listener.onItemClick(position);
+                    }
+                });
             case CODE_MRT:
                 holder.textView.setText(((Meeting)(data.get(position))).getTitle());
                 holder.layout.setOnClickListener(new View.OnClickListener() {

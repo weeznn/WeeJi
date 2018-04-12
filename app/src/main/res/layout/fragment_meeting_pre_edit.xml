@@ -59,6 +59,7 @@
             android:textSize="24sp" />
     </android.support.design.widget.TextInputLayout>
 
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="0dp"

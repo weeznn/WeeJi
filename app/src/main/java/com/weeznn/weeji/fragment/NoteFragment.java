@@ -1,6 +1,9 @@
 package com.weeznn.weeji.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -17,9 +20,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.weeznn.mylibrary.utils.Constant;
 import com.weeznn.weeji.MyApplication;
 import com.weeznn.weeji.R;
+import com.weeznn.weeji.activity.DetailActivity;
 import com.weeznn.weeji.adpater.NoteAdapter;
+import com.weeznn.weeji.interfaces.ItemClickListener;
 import com.weeznn.weeji.util.db.NoteDao;
 import com.weeznn.weeji.util.db.entry.Note;
 
@@ -30,36 +36,42 @@ import java.util.List;
  * Created by weeznn on 2018/4/2.
  */
 
-public class NoteFragment extends Fragment{
-    private static final String TAG= NoteFragment.class.getSimpleName();
-
+public class NoteFragment extends Fragment implements
+        Constant,
+        ItemClickListener {
+    private static final String TAG = NoteFragment.class.getSimpleName();
+    private static final int MSG_CODE_UPDATA=1;
     //view
     private RecyclerView recyclerView;
     private SwipeRefreshLayout refreshLayout;
     private Toolbar toolbar;
-    private TextView toolbarTitle;
-    private ActionBar actionBar;
     private FloatingActionButton fab;
+    private Handler handler=new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            refreshLayout.setRefreshing(false);
+            return true;
+        }
+    });
 
     //逻辑
-    private List<Note> data=new ArrayList<>();
+    private List<Note> data = new ArrayList<>();
     private NoteAdapter adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter=new NoteAdapter(getContext(),data);
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.fragment_metting, container, false);
-        recyclerView=view.findViewById(R.id.recyclerView);
-        refreshLayout=view.findViewById(R.id.freshLayout);
-        toolbar=view.findViewById(R.id.toolbar);
-        toolbarTitle=view.findViewById(R.id.text);
-        fab=view.findViewById(R.id.fab);
+        View view = inflater.inflate(R.layout.fragment_metting, container, false);
+        recyclerView = view.findViewById(R.id.recyclerView);
+        refreshLayout = view.findViewById(R.id.freshLayout);
+        toolbar = view.findViewById(R.id.toolbar);
+        fab = view.findViewById(R.id.fab);
         return view;
     }
 
@@ -70,31 +82,19 @@ public class NoteFragment extends Fragment{
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                MyApplication.getInstant().runInTx(new Runnable() {
-                    @Override
-                    public void run() {
-                        NoteDao dao=MyApplication.getInstant().getNoteDao();
-                        data=dao.queryBuilder()
-                                .limit(10)
-                                .list();
-                        adapter.notifyDataSetChanged();
-                        refreshLayout.setRefreshing(false);
-                    }
-                });
+                updata();
+                handler.sendEmptyMessage(MSG_CODE_UPDATA);
             }
         });
 
 
         //recyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new NoteAdapter(getContext(), data);
+        adapter.setItemClickListener(this);
         recyclerView.setAdapter(adapter);
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 
-        //toolbar
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        actionBar=((AppCompatActivity)getActivity()).getSupportActionBar();
-        toolbarTitle.setText(R.string.nav_skill_diary);
-        toolbar.setTitleTextColor(getResources().getColor(R.color.colorWright));
 
         //fab
         fab.setOnClickListener(new View.OnClickListener() {
@@ -103,5 +103,41 @@ public class NoteFragment extends Fragment{
                 // TODO: 2018/4/4 添加
             }
         });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        refreshLayout.setRefreshing(true);
+        while (refreshLayout.isRefreshing()) {
+            updata();
+            refreshLayout.setRefreshing(false);
+        }
+    }
+
+    public void updata() {
+        MyApplication.getInstant().runInTx(new Runnable() {
+            @Override
+            public void run() {
+                NoteDao dao = MyApplication.getInstant().getNoteDao();
+                data = dao.queryBuilder()
+                        .limit(10)
+                        .list();
+                adapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        Intent intent=new Intent(getActivity(), DetailActivity.class);
+        intent.putExtra(getString(R.string.LEFT_TYPE),CODE_NOT);
+        intent.putExtra(getString(R.string.LEFT_CODE),data.get(position).get_noteID());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onItemLongClick(int position) {
+
     }
 }

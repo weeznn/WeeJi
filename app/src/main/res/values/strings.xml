@@ -7,7 +7,7 @@
 
     <string name="perference_baidu_title">百度语音参数设置</string>
     <string name="perference_baidu_language_title">语言</string>
-    <string name="perf_language_defaul_value">1537</string>
+
     <string-array name="baidu_language">
         <item>中文普通话</item>
         <item>中文四川话</item>
@@ -23,13 +23,14 @@
         <item>1737</item>
         <item>1936</item>
     </string-array>
+
     <string name="perference_baidu_audio_title">保存录音文件</string>
     <string name="perference_baidu_audio_sum">将会识别过程中的录音文件保存到本地</string>
     <string name="perference_baidu_anim_title">音频动画</string>
     <string name="perference_baidu_anim_sum">将会识别过程中的使用频谱动画！会消耗一定CPU和电量！</string>
     <string name="perference_baidu_prop_title">垂直领域</string>
     <string name="perference_baidu_prop_sum">选择您的领域可略微提高识别率！具体效果以实际测试为准！</string>
-    <string name="perf_porp_defaul_value">10005</string>
+
     <string-array name="perference_baidu_prop">
         <item>热词</item>
         <item>地图</item>
@@ -49,6 +50,7 @@
         <item>助手</item>
         <item>输入</item>
     </string-array>
+
     <string-array name="perference_baidu_prop_code">
         <item>10005</item>
         <item>10060</item>
@@ -68,6 +70,7 @@
         <item>10058</item>
         <item>20000</item>
     </string-array>
+
     <string name="perference_baidu_ring_title">提示音</string>
     <string name="perference_baidu_ring_sum">开启后，软件将会在说话开始|结束、识别成功|出错|取消时播放提示音</string>
     <string name="title_activity_settings">Settings</string>
@@ -78,7 +81,7 @@
     <string name="pref_baidu_audio">audio</string>
     <string name="pref_baidu_ring">ring</string>
 
-    //我的
+    //我的 key
     <string name="pref_self_name">name</string>
     <string name="pref_self_job">job</string>
     <string name="pref_self_company">company</string>
@@ -87,8 +90,7 @@
     <string name="pref_self_photo">photo</string>
     <string name="pref_sim_self_json">sim_self_json</string>
     <string name="pref_self_json">self_json</string>
-
-
+    //我的 value
     <string name="pref_self_def_name">我</string>
     <string name="pref_self_def_job">##########</string>
     <string name="pref_self_def_company">￥￥￥￥￥￥￥￥￥￥</string>
@@ -166,11 +168,12 @@
     <string name="TABLE_DAI_date">date</string>
     <string name="TABLE_DAI_address">address</string>
     <string name="TABLE_DAI_mood">mood</string>
+    <string name="TABLE_DAI_image">mood</string>
     <!--Table NOT-->
 
     <string name="TABLE_NOT_noteID">_noteID</string>
     <string name="TABLE_NOT_time">time</string>
-    <string name="TABLE_NOT_cache">cache</string>
+    <string name="TABLE_NOT_cache">image</string>
     <string name="TABLE_NOT_sub">sub</string>
     <string name="TABLE_NOT_source">source</string>
     <!--Table PEO-->
@@ -185,4 +188,7 @@
     <string name="permission_message">「WeeJi」的正常使用需要获取网络、磁盘、麦克风等权限！</string>
 
     <string name="AUDIO_RESOULT_NOFILE">音频文件已被删除!</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -19,11 +19,17 @@ import com.weeznn.mylibrary.utils.Constant;
 import com.weeznn.weeji.MyApplication;
 import com.weeznn.weeji.R;
 import com.weeznn.weeji.adpater.DetailAdapter;
+import com.weeznn.weeji.fragment.DairyDetailFragment;
 import com.weeznn.weeji.fragment.MeetingDetailFragment;
+import com.weeznn.weeji.fragment.NoteDetailFragment;
 import com.weeznn.weeji.interfaces.ItemClickListener;
 import com.weeznn.weeji.interfaces.UpdataFragmentDetailListener;
+import com.weeznn.weeji.util.db.DiaryDao;
 import com.weeznn.weeji.util.db.MeetingDao;
+import com.weeznn.weeji.util.db.NoteDao;
+import com.weeznn.weeji.util.db.entry.Diary;
 import com.weeznn.weeji.util.db.entry.Meeting;
+import com.weeznn.weeji.util.db.entry.Note;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +66,7 @@ public class DetailActivity extends AppCompatActivity implements
 
         Intent intent=getIntent();
         type=intent.getIntExtra(getResources().getString(R.string.LEFT_TYPE),CODE_MRT);
-        code=intent.getLongExtra(getResources().getString(R.string.LEFT_CODE),DEFAULT);
+        code=intent.getLongExtra(getString(R.string.LEFT_CODE),DEFAULT);
 
         Log.i(TAG,"onCreate type:"+type+"   code:"+code);
 
@@ -73,27 +79,36 @@ public class DetailActivity extends AppCompatActivity implements
 
     }
 
+
     /**
      * 侧边栏的数据
      */
     private void initLeftData() {
-        final int[] offset=new int[]{1};
         MyApplication.getInstant().runInTx(new Runnable() {
             @Override
             public void run() {
                 switch (type){
                         case CODE_DAI:
+                            DiaryDao diaryDao=MyApplication.getInstant().getDiaryDao();
+                            List<Diary> resultD=diaryDao.queryBuilder()
+                                    .list();
+                            list.addAll(resultD);
+                            adapter.notifyDataSetChanged();
                         case CODE_NOT:
+                            NoteDao noteDao=MyApplication.getInstant().getNoteDao();
+                            List<Note> resultN=noteDao.queryBuilder()
+                                    .list();
+                            list.addAll(resultN);
+                            adapter.notifyDataSetChanged();
                         case CODE_MRT:
-                        MeetingDao dao=MyApplication.getInstant().getMeetingDao();
-                        List<Meeting> result=dao.queryBuilder()
-                                .limit(15)
+                        MeetingDao meetingDao=MyApplication.getInstant().getMeetingDao();
+                        List<Meeting> result=meetingDao.queryBuilder()
                                 .list();
                         list.addAll(result);
                         adapter.notifyDataSetChanged();
-                        Log.i(TAG,"updata size "+list.size());
                         break;
                 }
+                Log.i(TAG,"updata size "+list.size());
             }
         });
     }
@@ -104,9 +119,12 @@ public class DetailActivity extends AppCompatActivity implements
         imageView=findViewById(R.id.image);
 
         switch (type){
-            // TODO: 2018/4/7 哈哈哈哈哈哈，现在只有这一个
             case CODE_DAI:
+                fragment= DairyDetailFragment.newInstance(code);
+                imageView.setBackground(getResources().getDrawable(R.drawable.ic_diary));
             case CODE_NOT:
+                fragment= NoteDetailFragment.newInstance(code);
+                imageView.setBackground(getResources().getDrawable(R.drawable.ic_note));
             case CODE_MRT:
                 fragment= MeetingDetailFragment.newInstance(code);
                 imageView.setBackground(getResources().getDrawable(R.drawable.ic_meeting));
@@ -135,14 +153,15 @@ public class DetailActivity extends AppCompatActivity implements
     public void onItemClick(int position) {
         switch (type){
             case CODE_DAI:
+                code=((Diary)list.get(position)).get_DAIID();
+                break;
             case CODE_NOT:
             case CODE_MRT:
                 code=(((Meeting)list.get(position)).get_metID());
-                Log.i(TAG,"item position: "+position+"  code:"+code);
-                updataFragmentDetailListener.updata(code);
                 break;
         }
-
+        updataFragmentDetailListener.updata(code);
+        Log.i(TAG,"item position: "+position+"  code:"+code);
     }
 
     @Override

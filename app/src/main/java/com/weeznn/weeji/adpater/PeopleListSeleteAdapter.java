@@ -9,7 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -27,39 +27,39 @@ import java.util.List;
  * Created by weeznn on 2018/4/6.
  */
 
-public class PeopleListSeleteAdapter extends RecyclerView.Adapter<PeopleListSeleteAdapter.PeopleSeleteViewHolder>{
+public class PeopleListSeleteAdapter extends RecyclerView.Adapter<PeopleListSeleteAdapter.PeopleSeleteViewHolder> {
 
-    private static final String TAG="PeopleListSeleteAdapter";
+    private static final String TAG = "PeopleListSeleteAdapter";
 
-    private List<People> data=new LinkedList<>();
-    private List<SimplePeople> simplePeopleList=new LinkedList<>();
+    private List<People> data = new LinkedList<>();
+    private List<SimplePeople> simplePeopleList = new LinkedList<>();
     private LayoutInflater inflater;
     private ItemClickListener listener;
 
-    public void setItemClickListener(ItemClickListener listener){
-        this.listener=listener;
+    public void setItemClickListener(ItemClickListener listener) {
+        this.listener = listener;
     }
 
-    public PeopleListSeleteAdapter(Context context,List<People> peopleList,List<SimplePeople>simplePeople){
-        Log.i(TAG,"PeopleListSeleteAdapter  people List Size : "+peopleList.size()+"   simple people list size "+simplePeople.size());
-        this.data=peopleList;
-        this.inflater=LayoutInflater.from(context);
-        this.simplePeopleList=simplePeople;
+    public PeopleListSeleteAdapter(Context context, List<People> peopleList, List<SimplePeople> simplePeople) {
+        Log.i(TAG, "PeopleListSeleteAdapter  people List Size : " + peopleList.size() + "   simple people list size " + simplePeople.size());
+        this.data = peopleList;
+        this.inflater = LayoutInflater.from(context);
+        this.simplePeopleList = simplePeople;
     }
 
     @Override
     public PeopleSeleteViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            Log.i(TAG,"onCreateViewHolder");
-            View view=inflater.inflate(R.layout.item_people_list_select,parent,false);
-            return new PeopleSeleteViewHolder(view);
+        Log.i(TAG, "onCreateViewHolder");
+        View view = inflater.inflate(R.layout.item_people_list_select, parent, false);
+        return new PeopleSeleteViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(PeopleSeleteViewHolder holder, int position) {
         final People people = data.get(position);
 
-        Log.i(TAG,"bindSeleteViewHolder");
-        RequestOptions options=new RequestOptions();
+        Log.i(TAG, "bindSeleteViewHolder");
+        RequestOptions options = new RequestOptions();
         options.circleCrop()
                 .error(R.drawable.ic_user_black)
                 .placeholder(R.drawable.ic_user_black);
@@ -68,15 +68,14 @@ public class PeopleListSeleteAdapter extends RecyclerView.Adapter<PeopleListSele
                 .apply(options)
                 .into(holder.imageView);
 
-        holder.chrckBtn.setOnClickListener(new View.OnClickListener() {
+        holder.chrck.setOnClickListener(new View.OnClickListener() {
 
             @SuppressLint("RestrictedApi")
             @Override
             public void onClick(View v) {
-                CheckableImageButton view1 = v.findViewById(R.id.check);
-                cllick(view1.isChecked(),people);
+                CheckBox view1 = v.findViewById(R.id.check);
+                cllick(view1.isChecked(), people);
                 view1.setChecked(!view1.isChecked());
-
             }
         });
 
@@ -87,14 +86,14 @@ public class PeopleListSeleteAdapter extends RecyclerView.Adapter<PeopleListSele
             @SuppressLint("RestrictedApi")
             @Override
             public void onClick(View v) {
-                CheckableImageButton view1 = v.findViewById(R.id.check);
-               cllick(view1.isChecked(),people);
-               view1.setChecked(!view1.isChecked());
+                CheckBox view1 = v.findViewById(R.id.check);
+                cllick(view1.isChecked(), people);
+                view1.setChecked(!view1.isChecked());
             }
         });
     }
 
-    private void cllick(boolean b, People people){
+    private void cllick(boolean b, People people) {
         if (b) {
             Log.i(TAG, "被选中，添加");
             //添加到simpledata中
@@ -108,7 +107,7 @@ public class PeopleListSeleteAdapter extends RecyclerView.Adapter<PeopleListSele
 
     @Override
     public int getItemCount() {
-        Log.i(TAG,"getItemCount"+data.size());
+        Log.i(TAG, "getItemCount" + data.size());
         return data.size();
     }
 
@@ -120,7 +119,7 @@ public class PeopleListSeleteAdapter extends RecyclerView.Adapter<PeopleListSele
         public TextView name;
         public TextView job;
         public ConstraintLayout layout;
-        public CheckableImageButton chrckBtn;
+        public CheckBox chrck;
 
         public PeopleSeleteViewHolder(View itemView) {
             super(itemView);
@@ -128,7 +127,7 @@ public class PeopleListSeleteAdapter extends RecyclerView.Adapter<PeopleListSele
             name = itemView.findViewById(R.id.name);
             job = itemView.findViewById(R.id.job);
             layout = itemView.findViewById(R.id.layout);
-            chrckBtn = itemView.findViewById(R.id.check);
+            chrck = itemView.findViewById(R.id.check);
         }
     }
 }

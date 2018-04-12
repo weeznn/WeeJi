@@ -14,11 +14,8 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -112,6 +109,9 @@ public class MainActivity extends AppCompatActivity
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
+//        nav_header_text=findViewById(R.id.nav_header_text);
+//        nav_header_text.setText(getSharedPreferences(getString(R.string.SharedPreferences_name),0).getString(getString(R.string.pref_self_name),"你").toCharArray()[0]);
+
         //navigationView
         navigationView = findViewById(R.id.nav_view);
 //        为header中的view设置背景
@@ -170,9 +170,10 @@ public class MainActivity extends AppCompatActivity
                 //自我信息
                 Fragment fragment = new PeopleDetailFragment();
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.add(fragment, PeopleDetailFragment.FLAG_BACK);
+                transaction.replace(R.id.frameLayout,fragment, PeopleDetailFragment.FLAG_BACK);
                 transaction.addToBackStack(defFragment.getTag());
                 transaction.commit();
+                drawerLayout.closeDrawer(GravityCompat.START);
                 break;
         }
         return true;
@@ -191,7 +192,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.i(TAG,"OnActivityResult  requestCode :"+requestCode+"   resultCode:"+resultCode);
         if (data!=null){
@@ -227,15 +228,19 @@ public class MainActivity extends AppCompatActivity
                                 @Override
                                 public void run() {
                                     DiaryDao dao = MyApplication.getInstant().getDiaryDao();
+                                    String date=bundle.getString(getResources().getString(R.string.TABLE_DAI_date),"");
+                                    String addr=bundle.getString(getResources().getString(R.string.TABLE_DAI_address),"");
                                     dao.insert(
                                             new Diary(
-                                                    bundle.getString(getResources().getString(R.string.TABLE_DAI_date),""),
-                                                    bundle.getString(getResources().getString(R.string.TABLE_DAI_address),""),
-                                                    bundle.getInt(getResources().getString(R.string.TABLE_DAI_mood),0)
+                                                    (date+addr).hashCode(),
+                                                    date,
+                                                    addr,
+                                                    bundle.getInt(getResources().getString(R.string.TABLE_DAI_mood),0),
+                                                    bundle.getString(getString(R.string.TABLE_DAI_image),"")
                                             ));
                                 }
                             });
-                            Log.i(TAG,"meeting insert");
+                            Log.i(TAG,"dairy insert");
                         }
                         break;
                     case REQUEST_CODE_NOT:
@@ -250,11 +255,11 @@ public class MainActivity extends AppCompatActivity
                                                     bundle.getString(getResources().getString(R.string.TABLE_NOT_time),""),
                                                     bundle.getString(getResources().getString(R.string.TABLE_NOT_cache),""),
                                                     bundle.getString(getResources().getString(R.string.TABLE_NOT_sub),""),
-                                                    bundle.getInt(getResources().getString(R.string.TABLE_NOT_source),0)
+                                                    bundle.getString(getResources().getString(R.string.TABLE_NOT_source),"")
                                             ));
                                 }
                             });
-                            Log.i(TAG,"meeting insert");
+                            Log.i(TAG,"note insert");
                         }
                         break;
                 }
@@ -264,5 +269,6 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment=getSupportFragmentManager().findFragmentByTag(MettingFragment.TAG_BACK);
         getSupportFragmentManager().popBackStack();
         getSupportFragmentManager().beginTransaction().show(fragment).commit();
+
     }
 }

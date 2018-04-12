@@ -106,8 +106,7 @@ public class PeopleListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view;
-        view = inflater.inflate(R.layout.fragment_people_list, container, false);
+        View view= inflater.inflate(R.layout.fragment_people_list, container, false);
         toolbar = view.findViewById(R.id.toolbar);
         toolbatText = view.findViewById(R.id.text);
         recyclerView = view.findViewById(R.id.recyclerView);

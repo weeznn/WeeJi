@@ -1,11 +1,14 @@
 package com.weeznn.weeji.fragment;
 
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -15,12 +18,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
 import android.widget.TextView;
 
+import com.weeznn.mylibrary.utils.Constant;
 import com.weeznn.weeji.MyApplication;
 import com.weeznn.weeji.R;
+import com.weeznn.weeji.activity.DetailActivity;
 import com.weeznn.weeji.adpater.DiaryAdapter;
 import com.weeznn.weeji.adpater.MettingAdapter;
+import com.weeznn.weeji.interfaces.ItemClickListener;
 import com.weeznn.weeji.util.db.DiaryDao;
 import com.weeznn.weeji.util.db.MeetingDao;
 import com.weeznn.weeji.util.db.entry.Diary;
@@ -33,25 +40,28 @@ import java.util.List;
  * Created by weeznn on 2018/4/2.
  */
 
-public class DiaryFragment extends Fragment {
+public class DiaryFragment extends Fragment implements
+        Constant,
+        ItemClickListener{
     private static final String TAG= DiaryFragment.class.getSimpleName();
+
 
     //view
     private RecyclerView recyclerView;
     private SwipeRefreshLayout refreshLayout;
-    private Toolbar toolbar;
-    private TextView toolbarTitle;
-    private android.support.v7.app.ActionBar actionBar;
     private FloatingActionButton fab;
-
+    private Toolbar toolbar;
     //逻辑
     private List<Diary> data=new ArrayList<>();
     private DiaryAdapter adapter;
+    private Fragment fragment;
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adapter=new DiaryAdapter(getContext(),data);
+        hasOptionsMenu();
+        fragment=this;
     }
 
     @Override
@@ -61,7 +71,6 @@ public class DiaryFragment extends Fragment {
         recyclerView=view.findViewById(R.id.recyclerView);
         refreshLayout=view.findViewById(R.id.freshLayout);
         toolbar=view.findViewById(R.id.toolbar);
-        toolbarTitle=view.findViewById(R.id.text);
         fab=view.findViewById(R.id.fab);
         return view;
     }
@@ -73,31 +82,19 @@ public class DiaryFragment extends Fragment {
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                MyApplication.getInstant().runInTx(new Runnable() {
-                    @Override
-                    public void run() {
-                        DiaryDao dao=MyApplication.getInstant().getDiaryDao();
-                        data=dao.queryBuilder()
-                                .limit(10)
-                                .list();
-                        adapter.notifyDataSetChanged();
-                        refreshLayout.setRefreshing(false);
-                    }
-                });
+               updata();
             }
         });
 
 
         //recyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter=new DiaryAdapter(getContext(),data);
         recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
 
         //toolbar
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        actionBar=((AppCompatActivity)getActivity()).getSupportActionBar();
-       toolbarTitle.setText(R.string.nav_skill_diary);
-        toolbar.setTitleTextColor(getResources().getColor(R.color.colorWright));
 
         //fab
         fab.setOnClickListener(new View.OnClickListener() {
@@ -108,4 +105,42 @@ public class DiaryFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        //第一次添加数据
+        refreshLayout.setRefreshing(true);
+        while (refreshLayout.isRefreshing()){
+            updata();
+            refreshLayout.setRefreshing(false);
+        }
+    }
+
+    private void updata(){
+        MyApplication.getInstant().runInTx(new Runnable() {
+            @Override
+            public void run() {
+                DiaryDao diaryDao=MyApplication.getInstant().getDiaryDao();
+                List<Diary> result=diaryDao.queryBuilder()
+                        .limit(10)
+                        .list();
+                data.addAll(result);
+                adapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+
+    @Override
+    public void onItemClick(int position) {
+        Intent intent=new Intent(getActivity(), DetailActivity.class);
+        intent.putExtra(getString(R.string.LEFT_TYPE),CODE_DAI);
+        intent.putExtra(getString(R.string.LEFT_CODE),data.get(position).get_DAIID());
+        startActivity(intent);
+    }
+
+    @Override
+    public void onItemLongClick(int position) {
+
+    }
 }

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+        android:singleLineTitle="true"
+        android:title="@string/perference_baidu_title">
+
+        <ListPreference
+            android:key="language"
+            android:title="@string/perference_baidu_language_title"
+            android:entries="@array/baidu_language"
+            android:entryValues="@array/baidu_language_code"/>
+        <SwitchPreference
+            android:key="ring"
+            android:title="@string/perference_baidu_ring_title"
+            android:summary="@string/perference_baidu_ring_sum"/>
+        <SwitchPreference
+            android:key="anim"
+            android:title="@string/perference_baidu_anim_title"
+            android:summary="@string/perference_baidu_anim_sum"/>
+        <SwitchPreference
+            android:key="audio"
+            android:title="@string/perference_baidu_audio_title"
+            android:summary="@string/perference_baidu_audio_sum"/>
+        <ListPreference
+            android:key="prop"
+            android:title="@string/perference_baidu_prop_title"
+            android:summary="@string/perference_baidu_prop_sum"
+            android:entries="@array/perference_baidu_prop"
+            android:entryValues="@array/perference_baidu_prop_code"/>
+    </PreferenceCategory>
+
+</PreferenceScreen>

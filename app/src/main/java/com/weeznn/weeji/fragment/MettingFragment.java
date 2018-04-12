@@ -75,11 +75,6 @@ public class MettingFragment extends Fragment
 
     }
 
-    private void initdata() {
-        data.add(new Meeting(111111,"2018/4/5","这是TITLE","asdfadf","adfasdfas","adfsfafd","dadfadsf","qwertytyuiodfghdal;kdsjfal;kdjf","mmm"));
-        data.add(new Meeting(111111,"2018/4/5","这是TITLE","asdfadf","adfasdfas","adfsfafd","dadfadsf","qwertytyuiodfghdal;kdsjfal;kdjf","mmm"));
-    }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -156,7 +151,6 @@ public class MettingFragment extends Fragment
                         .list();
                 Log.i(TAG,"DB query size:"+list.size());
                 data.addAll(list);
-                initdata();
                 Log.i(TAG,"onRefresh data size ="+data.size());
                 mettingAdapter.notifyDataSetChanged();
                 handler.sendMessage(new Message());

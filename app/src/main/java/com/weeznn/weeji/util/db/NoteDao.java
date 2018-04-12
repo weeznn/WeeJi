@@ -26,9 +26,9 @@ public class NoteDao extends AbstractDao<Note, Long> {
     public static class Properties {
         public final static Property _noteID = new Property(0, long.class, "_noteID", true, "_id");
         public final static Property Time = new Property(1, String.class, "time", false, "TIME");
-        public final static Property Cache = new Property(2, String.class, "cache", false, "CACHE");
+        public final static Property Image = new Property(2, String.class, "image", false, "IMAGE");
         public final static Property Sub = new Property(3, String.class, "sub", false, "SUB");
-        public final static Property Source = new Property(4, int.class, "source", false, "SOURCE");
+        public final static Property Source = new Property(4, String.class, "source", false, "SOURCE");
     }
 
 
@@ -46,9 +46,9 @@ public class NoteDao extends AbstractDao<Note, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"NOTE\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY NOT NULL ," + // 0: _noteID
                 "\"TIME\" TEXT," + // 1: time
-                "\"CACHE\" TEXT," + // 2: cache
+                "\"IMAGE\" TEXT," + // 2: image
                 "\"SUB\" TEXT," + // 3: sub
-                "\"SOURCE\" INTEGER NOT NULL );"); // 4: source
+                "\"SOURCE\" TEXT);"); // 4: source
     }
 
     /** Drops the underlying database table. */
@@ -67,16 +67,20 @@ public class NoteDao extends AbstractDao<Note, Long> {
             stmt.bindString(2, time);
         }
  
-        String cache = entity.getCache();
-        if (cache != null) {
-            stmt.bindString(3, cache);
+        String image = entity.getImage();
+        if (image != null) {
+            stmt.bindString(3, image);
         }
  
         String sub = entity.getSub();
         if (sub != null) {
             stmt.bindString(4, sub);
         }
-        stmt.bindLong(5, entity.getSource());
+ 
+        String source = entity.getSource();
+        if (source != null) {
+            stmt.bindString(5, source);
+        }
     }
 
     @Override
@@ -89,16 +93,20 @@ public class NoteDao extends AbstractDao<Note, Long> {
             stmt.bindString(2, time);
         }
  
-        String cache = entity.getCache();
-        if (cache != null) {
-            stmt.bindString(3, cache);
+        String image = entity.getImage();
+        if (image != null) {
+            stmt.bindString(3, image);
         }
  
         String sub = entity.getSub();
         if (sub != null) {
             stmt.bindString(4, sub);
         }
-        stmt.bindLong(5, entity.getSource());
+ 
+        String source = entity.getSource();
+        if (source != null) {
+            stmt.bindString(5, source);
+        }
     }
 
     @Override
@@ -111,9 +119,9 @@ public class NoteDao extends AbstractDao<Note, Long> {
         Note entity = new Note( //
             cursor.getLong(offset + 0), // _noteID
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // time
-            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // cache
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // image
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // sub
-            cursor.getInt(offset + 4) // source
+            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4) // source
         );
         return entity;
     }
@@ -122,9 +130,9 @@ public class NoteDao extends AbstractDao<Note, Long> {
     public void readEntity(Cursor cursor, Note entity, int offset) {
         entity.set_noteID(cursor.getLong(offset + 0));
         entity.setTime(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
-        entity.setCache(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setImage(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setSub(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setSource(cursor.getInt(offset + 4));
+        entity.setSource(cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4));
      }
     
     @Override
