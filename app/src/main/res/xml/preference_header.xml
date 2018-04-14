@@ -5,5 +5,9 @@
         android:icon="@drawable/ic_mic_color"
         android:fragment="com.weeznn.weeji.fragment.BaiduSeettingFragment"
         android:title="@string/perference_baidu_title"/>
+    <header
+        android:icon="@drawable/ic_cast_connected"
+        android:fragment="com.weeznn.weeji.fragment.InternetSettingFragment"
+        android:title="@string/pref_intent_contronl"/>
 
 </preference-headers>

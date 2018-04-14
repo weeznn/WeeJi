@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +21,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.jar.Attributes;
 
 /**
  * Created by weeznn on 2018/4/2.
@@ -37,6 +39,7 @@ public class FileUtil {
     public static final String TYPE_JSON = "_JSON.txt";
     public static final String TYPE_TEXT = ".txt";
     public static final String TYPE_PCM = "out_file.pcm";
+    public static final String TYPE_IDEA = "_idea.txt";
 
     /**
      * 创建文件夹
@@ -54,17 +57,14 @@ public class FileUtil {
     }
     public static boolean makeDir(String type,String name) {
         name=name.replace(" ","");
-        name.replace(" ","");
-        String string[]=name.split("|");
-        String path = APPBASEPATH + type + "/"+ string[1]+"/"+string[0];
+        String path = APPBASEPATH + type + "/"+ name;
         return makeDir(path);
     }
 
     public static String getPath(String type,String name,String fileType){
         StringBuilder builder=new StringBuilder();
         builder.append(APPBASEPATH);
-        String string[]=name.split("|");
-        builder.append(type+"/"+string[1]+"/"+string[0]+fileType);
+        builder.append(type+"/"+name+"/"+name+fileType);
         return builder.toString();
     }
 
@@ -75,8 +75,7 @@ public class FileUtil {
      */
     public static void deleteFile(String type,String name){
         name=name.replace(" ","");
-        String string[]=name.split("|");
-        String path=APPBASEPATH+type+"/"+string[1]+"/"+string[0]+name;
+        String path=APPBASEPATH+type+"/"+name;
         Log.i(TAG,"deleteFile :"+path);
         File file=new File(path);
         if (file.exists()){
@@ -150,9 +149,34 @@ public class FileUtil {
      */
     public static String ReadText(String type, String fileName) {
         fileName=fileName.replace(" ","");
-        String string[]=fileName.split("|");
-        String path = APPBASEPATH + type + "/" + string[1]+"/"+string[0] + "/" + fileName + ".txt";
+        String path = APPBASEPATH + type + "/" + fileName+"/" + fileName + ".txt";
         Log.i(TAG,"read text :"+path);
+        File file = new File(path);
+        StringBuilder builder = new StringBuilder();
+        try {
+            InputStream inputStream = new FileInputStream(file);
+            BufferedInputStream stream = new BufferedInputStream(inputStream);
+            int readcound;
+            byte[] buffer = new byte[1024];
+            while ((readcound = stream.read(buffer)) != -1) {
+                builder.append(buffer);
+            }
+            stream.close();
+            inputStream.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Log.i(TAG,"read text resoule:"+builder.toString());
+        return builder.toString();
+    }
+
+    /**
+     * 读文本
+     * @return
+     */
+    public static String ReadText(String path) {
         File file = new File(path);
         StringBuilder builder = new StringBuilder();
         try {
@@ -183,9 +207,8 @@ public class FileUtil {
      */
     public static void WriteText(String type, String fileName,int filetype ,String data) {
         fileName=fileName.replace(" ","");
-        String string[]=fileName.split("|");
         String dirpath=APPBASEPATH + type + "/" +
-                string[1]+"/"+string[0];
+                fileName;
         File filedir=new File(dirpath);
         if (!filedir.exists()){
             filedir.mkdir();
@@ -237,9 +260,8 @@ public class FileUtil {
      */
     public static void WriteAudio(String type, String fileName, byte[] data, int length, int offset) throws FileNotFoundException {
         fileName=fileName.replace(" ","" );
-        String string[]=fileName.split("|");
         String dirpath=APPBASEPATH + type + "/" +
-                string[1]+"/"+string[0];
+               fileName;
 
         String path= dirpath+ "/" +
                 fileName + ".pcm";
@@ -304,11 +326,12 @@ public class FileUtil {
         if (!FileUtil.makeDir(type,name)) {
             throw new RuntimeException("创建目录失败");
         }
-        String string[]=name.split("|");
-        File file = new File(APPBASEPATH+type+"/"+string[1]+"/"+string[0]+"/"+name+"_out_file.pcm");
+        File file = new File(APPBASEPATH+type+"/"+name+"/"+name+"_out_file.pcm");
 
         Log.i(TAG, "创建pcm临时文件 " + file.getAbsolutePath());
         return file.getAbsolutePath();
     }
+
+
 
 }

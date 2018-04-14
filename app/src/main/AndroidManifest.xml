@@ -54,6 +54,9 @@
 
         <service
             android:name=".service.AudioIntentService"
+            android:exported="false" />
+        <service
+            android:name=".service.NLPIntentService"
             android:exported="false"></service>
     </application>
 

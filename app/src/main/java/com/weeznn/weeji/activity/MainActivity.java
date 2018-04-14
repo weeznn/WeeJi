@@ -44,7 +44,6 @@ public class MainActivity extends AppCompatActivity
     private TextView nav_header_text;
     private ImageView nav_header_back;
     private ImageView nav_header_imag;
-    private TextView title;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
 
@@ -144,24 +143,23 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_menu_collection:
             case R.id.nav_menu_meeting:
                 //更新Fragment 的内容
-                if (defFragment.getTag() != "meeting") {
-                    title.setText(item.getTitle());
-                    fragmentManager.beginTransaction().replace(R.id.frameLayout, new MettingFragment(), "meeting").commit();
-                    drawerLayout.closeDrawer(GravityCompat.START);
+                fragmentManager.beginTransaction().replace(R.id.frameLayout, new MettingFragment(), "meeting").commit();
+                drawerLayout.closeDrawer(GravityCompat.START);
+                if (MettingFragment.TAG_BACK!=defFragment.getTag() ) {
+
                 }
                 break;
             case R.id.nav_menu_dairy:
                 //更新Fragment 的内容
+                fragmentManager.beginTransaction().replace(R.id.frameLayout, new DiaryFragment(), "dairy").commit();
+                drawerLayout.closeDrawer(GravityCompat.START);
                 if (defFragment.getTag() != "dairy") {
-                    title.setText(item.getTitle());
-                    fragmentManager.beginTransaction().replace(R.id.frameLayout, new DiaryFragment(), "dairy").commit();
-                    drawerLayout.closeDrawer(GravityCompat.START);
+
                 }
                 break;
             case R.id.nav_menu_note:
                 //笔记
                 if (defFragment.getTag() != "note") {
-                    title.setText(item.getTitle());
                     fragmentManager.beginTransaction().replace(R.id.frameLayout, new NoteFragment(), "note").commit();
                     drawerLayout.closeDrawer(GravityCompat.START);
                 }

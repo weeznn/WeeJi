@@ -100,6 +100,15 @@
     <string name="pref_self_def_json">{\"people\":[{\"name\":\"我\",\"job\":\"##########\","company":"￥￥￥￥￥￥￥￥￥￥","number":"11111111111","email":"abcdef@xyz.com","photo":""}]}</string>
     <string name="pref_self_def_sim_json">{\"people\":[{\"name\":\"我\",\"photo\":\"\",\"job\":\"##########\",\"company\":\"￥￥￥￥￥￥￥￥￥￥\"}]}</string>
 
+    <!--联网控制-->
+    <string name="pref_intent_contronl">网络</string>
+    <string name="pref_intent_4G_asr">使用2G/3G/4G网络识别</string>
+    <string name="pref_intent_4G_asr_sub">在2G/3G/4G网络下无法使用语音识别功能</string>
+    <string name="pref_intent_4G_nlp">使用2G/3G/4G网络分析</string>
+    <string name="pref_intent_4G_nlp_sub">在2G/3G/4G网络下无法得到关键信息/无法自动生成摘要和关键词</string>
+    <string name="pref_intent_only_wifi">仅wifi下联网</string>
+
+
     //主页面侧边栏
     <string name="nav_skill_title">功能</string>
     <string name="nav_skill_collection">收藏</string>
@@ -188,6 +197,8 @@
     <string name="permission_message">「WeeJi」的正常使用需要获取网络、磁盘、麦克风等权限！</string>
 
     <string name="AUDIO_RESOULT_NOFILE">音频文件已被删除!</string>
+
+    <string name="popUpWindowBtn">点击结束本次使用！</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

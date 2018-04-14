@@ -41,10 +41,12 @@ public class NoteFragment extends Fragment implements
         ItemClickListener {
     private static final String TAG = NoteFragment.class.getSimpleName();
     private static final int MSG_CODE_UPDATA=1;
+
     //view
     private RecyclerView recyclerView;
     private SwipeRefreshLayout refreshLayout;
     private Toolbar toolbar;
+    private TextView toolbarTitle;
     private FloatingActionButton fab;
     private Handler handler=new Handler(new Handler.Callback() {
         @Override
@@ -67,10 +69,11 @@ public class NoteFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_metting, container, false);
+        View view = inflater.inflate(R.layout.fragment_note, container, false);
         recyclerView = view.findViewById(R.id.recyclerView);
         refreshLayout = view.findViewById(R.id.freshLayout);
         toolbar = view.findViewById(R.id.toolbar);
+        toolbarTitle=view.findViewById(R.id.toolbar_title);
         fab = view.findViewById(R.id.fab);
         return view;
     }
@@ -95,6 +98,9 @@ public class NoteFragment extends Fragment implements
         recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 
+        //toolbar
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        toolbarTitle.setText("笔记");
 
         //fab
         fab.setOnClickListener(new View.OnClickListener() {

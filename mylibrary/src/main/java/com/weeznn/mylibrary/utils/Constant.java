@@ -19,4 +19,10 @@ public interface Constant {
     int CODE_DAI = 2;
     int CODE_NOT = 3;
 
+    //百度NLP词性 人名    地名  机构名 时间
+    String PRE="PRE";
+    String LOC="LOC";
+    String ORG="ORG";
+    String TIME="TIME";
+
 }

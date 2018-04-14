@@ -27,9 +27,13 @@ import com.weeznn.weeji.R;
 import com.weeznn.weeji.activity.DetailActivity;
 import com.weeznn.weeji.adpater.NoteDetailAdapter;
 import com.weeznn.weeji.interfaces.UpdataFragmentDetailListener;
+import com.weeznn.weeji.util.NoteTxt;
 import com.weeznn.weeji.util.db.NoteDao;
 import com.weeznn.weeji.util.db.entry.Note;
 
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -66,6 +70,7 @@ public class NoteDetailFragment extends Fragment {
     private String sub="";
     private String imagePath;
     private NoteDetailAdapter adapter;
+    private List<NoteTxt> list=new LinkedList<>();
 
     private OnFragmentInteractionListener mListener;
 
@@ -86,6 +91,7 @@ public class NoteDetailFragment extends Fragment {
             initInfo(code);
         }
 
+        //监听Detail Activity侧边栏的点击事件
         ((DetailActivity)getActivity()).setFragmentDetailListener(new UpdataFragmentDetailListener() {
             @Override
             public void updata(long code) {
@@ -167,6 +173,7 @@ public class NoteDetailFragment extends Fragment {
                         .into(imageView);
                 break;
             case MSG_CODE_METTING_FILE:
+                adapter.notifyDataSetChanged();
                 break;
             case MSG_CODE_METTING_UPDATA:
                 code= (long) msg.obj;
@@ -174,11 +181,15 @@ public class NoteDetailFragment extends Fragment {
         }
     }
 
-    private void readText(String title) {
+    private void readText(final String title) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                // TODO: 2018/4/12 找到文件夹下的所有目录下的文件并读出来
+                File path= new File(FileUtil.APPBASEPATH + FileUtil.FILE_TYPE_NOTE + "/" + title);
+                if (path.exists()&&path.isDirectory()){
+                    list.addAll(NoteTxt.read(path));
+                }
+                handler.sendEmptyMessage(MSG_CODE_METTING_FILE);
             }
         }).start();
     }
@@ -203,8 +214,6 @@ public class NoteDetailFragment extends Fragment {
                     data.addAll(noteList);
                     adapter.notifyDataSetChanged();
                 }
-
-
                 handler.sendEmptyMessage(MSG_CODE_METTING_DB);
             }
         });
@@ -216,4 +225,7 @@ public class NoteDetailFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+
+
 }

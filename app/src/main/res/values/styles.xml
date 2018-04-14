@@ -16,6 +16,7 @@
         <item name="android:colorControlNormal">@color/colorWright</item>
         <item name="android:textCursorDrawable">@null</item>
         <item name="android:textColorHint">@color/colorWright</item>
+        <item name="android:background">@null</item>
     </style>
 
     <style name="APPThemeFullScreen" parent="AppTheme">
@@ -41,5 +42,9 @@
         <item name="android:progressTint">@color/colorPrimary</item>
     </style>
 
+    <style name="popupanimation" parent="Animation.AppCompat.Dialog">
+        <item name="android:windowEnterAnimation">@anim/popup_in_from_bottom</item>
+        <item name="android:windowExitAnimation">@anim/popup_out_to_bottom</item>
+    </style>
 
 </resources>

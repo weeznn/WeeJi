@@ -13,6 +13,7 @@ import com.baidu.speech.EventManager;
 import com.baidu.speech.asr.SpeechConstant;
 import com.weeznn.mylibrary.utils.Constant;
 import com.weeznn.mylibrary.utils.FileUtil;
+import com.weeznn.weeji.activity.ASRActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,8 +32,6 @@ import static com.weeznn.mylibrary.utils.FileUtil.getOutFile;
 public class BaiduAsr implements Constant {
     private static final String TAG = "BaiduAsr";
     private static BaiduAsr baiduAsr;
-    public static final int MSGCODE_PART = 1;
-    public static final int MSGCODE_FINAL = 2;
     //Voice 的2个状态
     private static final int VOICE_STATE_REDY = 0;
     private static final int VOICE_STATE_SPEAKING = 1;
@@ -290,14 +289,14 @@ public class BaiduAsr implements Constant {
                             String str = jsonObject.getString("best_result");
                             Log.i(TAG, "text :" + str);
                             Message message = new Message();
-                            message.what = MSGCODE_FINAL;
+                            message.what = ASRActivity.MSG_BAIDUASR_FINAL;
                             message.obj = str;
                             baiduAsr.handler.sendMessage(message);
                         }else if ("partial_result".equals(jsonObject.getString("result_type"))){
                             String str = jsonObject.getString("best_result");
                             Log.i(TAG, "text :" + str);
                             Message message = new Message();
-                            message.what = MSGCODE_PART;
+                            message.what = ASRActivity.MSG_BAIDUASR_PART;
                             message.obj = str;
                             baiduAsr.handler.sendMessage(message);
                         }

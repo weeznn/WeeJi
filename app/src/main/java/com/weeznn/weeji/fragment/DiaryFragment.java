@@ -51,6 +51,7 @@ public class DiaryFragment extends Fragment implements
     private SwipeRefreshLayout refreshLayout;
     private FloatingActionButton fab;
     private Toolbar toolbar;
+    private TextView toolbatTitle;
     //逻辑
     private List<Diary> data=new ArrayList<>();
     private DiaryAdapter adapter;
@@ -71,6 +72,7 @@ public class DiaryFragment extends Fragment implements
         recyclerView=view.findViewById(R.id.recyclerView);
         refreshLayout=view.findViewById(R.id.freshLayout);
         toolbar=view.findViewById(R.id.toolbar);
+        toolbatTitle=view.findViewById(R.id.toolbar_title);
         fab=view.findViewById(R.id.fab);
         return view;
     }
@@ -95,6 +97,9 @@ public class DiaryFragment extends Fragment implements
 
         //toolbar
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        //toolbar
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        toolbatTitle.setText("笔记");
 
         //fab
         fab.setOnClickListener(new View.OnClickListener() {

@@ -1,7 +1,9 @@
 package com.weeznn.weeji.fragment;
 
 
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,7 +24,7 @@ import com.weeznn.weeji.R;
 import com.weeznn.weeji.util.db.PeopleDao;
 import com.weeznn.weeji.util.db.entry.People;
 
-public class PeopleDetailFragment extends Fragment {
+public class PeopleDetailFragment extends Fragment implements View.OnClickListener {
     public static final String TAG = PeopleDetailFragment.class.getSimpleName();
     public static final String FLAG_BACK="PeopleDetail";
     public static final String FLAG_ARG_PEOPLE_INFO="info";
@@ -38,7 +40,7 @@ public class PeopleDetailFragment extends Fragment {
     private String company;
 
     private int fabState=FAB_EDIT;
-    private boolean isSelf=true;
+    private boolean isSelf=true;//是不是本人的信息
 
 
     //view
@@ -54,6 +56,9 @@ public class PeopleDetailFragment extends Fragment {
     private TextInputEditText companyView;
     private KeyListener companylistener;
     private FloatingActionButton fab;
+
+    private ImageView imageCall;
+    private ImageView imageEmail;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -102,10 +107,12 @@ public class PeopleDetailFragment extends Fragment {
         emailView=view.findViewById(R.id.email);
         emaillistener=emailView.getKeyListener();
         emailView.setKeyListener(null);
+        imageEmail=view.findViewById(R.id.imageViewEmail);
 
         numberView=view.findViewById(R.id.number);
         numberlistener=numberView.getKeyListener();
         numberView.setKeyListener(null);
+        imageCall=view.findViewById(R.id.imageViewCall);
 
         fab=view.findViewById(R.id.fab);
         return view;
@@ -115,8 +122,6 @@ public class PeopleDetailFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-//        RequestOptions options=new RequestOptions();
-//        options.error(R.drawable.ic_user_black);
         Glide.with(photoView)
                 .load(photo)
                 .into(photoView);
@@ -127,20 +132,9 @@ public class PeopleDetailFragment extends Fragment {
         companyView.setText(company);
         jobView.setText(job);
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (FAB_EDIT==fabState){
-                    //编辑
-                    fab.setImageResource(R.drawable.ic_yes);
-                    edit();
-                }else {
-                    //编辑完毕
-                    down();
-                    fab.setImageResource(R.drawable.ic_edit);
-                }
-            }
-        });
+        fab.setOnClickListener(this);
+        imageCall.setOnClickListener(this);
+        imageEmail.setOnClickListener(this);
 
     }
 
@@ -193,4 +187,37 @@ public class PeopleDetailFragment extends Fragment {
         jobView.setKeyListener(joblistener);
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.fab:
+                if (FAB_EDIT==fabState){
+                    //编辑
+                    fab.setImageResource(R.drawable.ic_yes);
+                    edit();
+                }else {
+                    //编辑完毕
+                    down();
+                    fab.setImageResource(R.drawable.ic_edit);
+                }
+                break;
+            case R.id.imageViewCall:
+                if (!isSelf){
+                    Intent intent=new Intent();
+                    intent.setAction(Intent.ACTION_CALL_BUTTON);
+                    intent.setData(Uri.parse("tel:"+number));
+                    startActivity(intent);
+                }
+                break;
+            case R.id.imageViewEmail:
+                if (!isSelf){
+                    Intent intent=new Intent();
+                    intent.setAction(Intent.ACTION_SEND);
+                    intent.setType("plain/text");
+                    intent.putExtra(Intent.EXTRA_EMAIL,email);
+                    startActivity(intent);
+                }
+                break;
+        }
+    }
 }
