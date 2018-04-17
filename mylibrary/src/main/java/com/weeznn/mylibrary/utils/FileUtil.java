@@ -1,13 +1,17 @@
 package com.weeznn.mylibrary.utils;
 
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +21,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.IdentityHashMap;
@@ -36,10 +42,16 @@ public class FileUtil {
     public static final String FILE_TYPE_NOTE = "NOTE";
     public static final int FILE_TYPE_JSON = 1;
     public static final int FILE_TYPE_TEXT = 2;
+    public static final int FILE_TYPE_HEAD = 3;
+    public static final int FILE_TYPE_IMAGE = 4;
     public static final String TYPE_JSON = "_JSON.txt";
     public static final String TYPE_TEXT = ".txt";
-    public static final String TYPE_PCM = "out_file.pcm";
+    public static final String TYPE_PCM = "_out_file.pcm";
     public static final String TYPE_IDEA = "_idea.txt";
+    public static final String TYPE_MD = ".md";
+    public static final String SAVE_IMAGE=APPBASEPATH+"image/";
+    public static final String HEAD_PATH=APPBASEPATH+"head/";
+
 
     /**
      * 创建文件夹
@@ -62,6 +74,7 @@ public class FileUtil {
     }
 
     public static String getPath(String type,String name,String fileType){
+        name=name.replace(" ","");
         StringBuilder builder=new StringBuilder();
         builder.append(APPBASEPATH);
         builder.append(type+"/"+name+"/"+name+fileType);
@@ -151,25 +164,7 @@ public class FileUtil {
         fileName=fileName.replace(" ","");
         String path = APPBASEPATH + type + "/" + fileName+"/" + fileName + ".txt";
         Log.i(TAG,"read text :"+path);
-        File file = new File(path);
-        StringBuilder builder = new StringBuilder();
-        try {
-            InputStream inputStream = new FileInputStream(file);
-            BufferedInputStream stream = new BufferedInputStream(inputStream);
-            int readcound;
-            byte[] buffer = new byte[1024];
-            while ((readcound = stream.read(buffer)) != -1) {
-                builder.append(buffer);
-            }
-            stream.close();
-            inputStream.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        Log.i(TAG,"read text resoule:"+builder.toString());
-        return builder.toString();
+        return ReadText(path);
     }
 
     /**
@@ -180,15 +175,14 @@ public class FileUtil {
         File file = new File(path);
         StringBuilder builder = new StringBuilder();
         try {
-            InputStream inputStream = new FileInputStream(file);
-            BufferedInputStream stream = new BufferedInputStream(inputStream);
-            int readcound;
-            byte[] buffer = new byte[1024];
-            while ((readcound = stream.read(buffer)) != -1) {
-                builder.append(buffer);
+            InputStreamReader inputStreamReader=new InputStreamReader(new FileInputStream(file),"UTF-8");
+            BufferedReader reader=new BufferedReader(inputStreamReader);
+            String line="";
+            while ((line = reader.readLine()) != null) {
+                builder.append(line);
             }
-            stream.close();
-            inputStream.close();
+            reader.close();
+            inputStreamReader.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -205,7 +199,7 @@ public class FileUtil {
      * @param fileName
      * @param data
      */
-    public static void WriteText(String type, String fileName,int filetype ,String data) {
+    public static void WriteText(String type, String fileName,String filetype ,String data) {
         fileName=fileName.replace(" ","");
         String dirpath=APPBASEPATH + type + "/" +
                 fileName;
@@ -214,13 +208,7 @@ public class FileUtil {
             filedir.mkdir();
         }
 
-        String path = dirpath + "/"+fileName;
-        if (filetype==FILE_TYPE_JSON){
-            path=path+TYPE_JSON;
-        }else {
-            path=path+TYPE_TEXT;
-        }
-
+        String path = dirpath + "/"+fileName+filetype;
         File file=new File(path);
         if (!file.exists()){
             try {
@@ -230,7 +218,7 @@ public class FileUtil {
             }
         }
 
-        Log.i(TAG,"write text :"+path);
+        Log.i(TAG,"write text :"+path+" data :"+data);
 
         if (data==null){
             data="";
@@ -247,6 +235,7 @@ public class FileUtil {
             e.printStackTrace();
         }
     }
+
 
     /**
      * 写入音频PCM文件
@@ -332,6 +321,50 @@ public class FileUtil {
         return file.getAbsolutePath();
     }
 
+    public static void copyImage(@NonNull final String src, final String name, final int type){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String path="";
+                if (FILE_TYPE_HEAD==type){
+                    //头像
+                    path=HEAD_PATH;
+                }else {
+                    //图片
+                    path=SAVE_IMAGE;
+                }
+                File file=new File(path);
+                if (!file.exists()){
+                    file.mkdir();
+                }
+
+                path=path+"/"+name+".jpg";
+                File image=new File(path);
+
+                if (!image.exists()){
+                    try {
+                        image.createNewFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+
+                File in=new File(src);
+                try {
+                    InputStream inputStream=new FileInputStream(in);
+                    OutputStream outputStream=new FileOutputStream(image);
+                    BitmapFactory.decodeStream(inputStream)
+                            .compress(Bitmap.CompressFormat.PNG,30,outputStream);
+                    outputStream.flush();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
 
 
 }

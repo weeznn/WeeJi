@@ -57,7 +57,9 @@
             android:exported="false" />
         <service
             android:name=".service.NLPIntentService"
-            android:exported="false"></service>
+            android:exported="false"/>
+        <activity android:name=".activity.MarkDownActivity"
+            android:exported="false"/>
     </application>
 
 </manifest>

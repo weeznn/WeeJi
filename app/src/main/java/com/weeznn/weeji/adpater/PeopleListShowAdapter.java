@@ -27,7 +27,7 @@ import java.util.List;
 public class PeopleListShowAdapter extends RecyclerView.Adapter<PeopleListShowAdapter.PeopleShowViewHolder> {
     private static final String TAG = "PeopleListShowAdapter";
 
-    private List<People> data = new LinkedList<>();
+    private List<People> data;
     private LayoutInflater inflater;
     private ItemClickListener listener;
 

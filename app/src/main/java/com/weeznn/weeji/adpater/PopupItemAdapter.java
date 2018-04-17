@@ -12,6 +12,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.weeznn.weeji.R;
+import com.weeznn.weeji.interfaces.ItemClickListener;
 
 import java.util.List;
 
@@ -32,7 +33,11 @@ public class PopupItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     
     private List<String> data;
     private LayoutInflater inflater;
+    private ItemClickListener listener;
 
+    public void setItemClickListener(ItemClickListener listener){
+        this.listener=listener;
+    }
     public PopupItemAdapter(List<String> list, Context context, TYPE type){
         Log.i(TAG,"Create data size :"+ list.size());
         this.data=list;
@@ -53,20 +58,20 @@ public class PopupItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         Log.i(TAG,"onBindViewHolder");
         if (holder instanceof KeyWordViewHolder){
             ((KeyWordViewHolder) holder).textView.setText(data.get(position));
             ((KeyWordViewHolder) holder).checkBox.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO: 2018/4/14 选择这个item
+                    listener.onItemClick(position);
                 }
             });
             ((KeyWordViewHolder) holder).layout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO: 2018/4/14 选择这个item
+                  listener.onItemClick(position);
                 }
             });
         }
@@ -75,7 +80,7 @@ public class PopupItemAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             ((InterPointViewHolder) holder).layout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO: 2018/4/14
+                   listener.onItemClick(position);
                 }
             });
         }

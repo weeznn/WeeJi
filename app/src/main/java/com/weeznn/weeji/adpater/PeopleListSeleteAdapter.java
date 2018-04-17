@@ -3,7 +3,6 @@ package com.weeznn.weeji.adpater;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.CheckableImageButton;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,8 +30,8 @@ public class PeopleListSeleteAdapter extends RecyclerView.Adapter<PeopleListSele
 
     private static final String TAG = "PeopleListSeleteAdapter";
 
-    private List<People> data = new LinkedList<>();
-    private List<SimplePeople> simplePeopleList = new LinkedList<>();
+    private List<People> data;
+    private List<SimplePeople> simplePeopleList;
     private LayoutInflater inflater;
     private ItemClickListener listener;
 

@@ -125,12 +125,11 @@ public class MettingFragment extends Fragment
                 meetingPreEditfragment.setArguments(bundle);
 
                 FragmentTransaction transaction=getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.addToBackStack(MettingFragment.TAG_BACK);
-                transaction.hide(fragment);
-
-                transaction.setCustomAnimations(R.animator.fragment_enter_from_bottom,R.animator.fragment_exit_to_left);
-                transaction.add(R.id.frameLayout,meetingPreEditfragment,MeetingPreEditFragment.TAG_BACK);
-                transaction.commit();
+                transaction.addToBackStack(MettingFragment.TAG_BACK)
+                        .hide(fragment)
+                        .setCustomAnimations(R.animator.fragment_enter_from_bottom,R.animator.fragment_exit_to_left)
+                        .add(R.id.frameLayout,meetingPreEditfragment,MeetingPreEditFragment.TAG_BACK)
+                        .commit();
             }
         });
 
@@ -163,6 +162,7 @@ public class MettingFragment extends Fragment
     public void onStart() {
         super.onStart();
         //第一次添加数据
+        data.clear();
         refreshLayout.setRefreshing(true);
         while (refreshLayout.isRefreshing()){
             updata();

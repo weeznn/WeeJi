@@ -1,6 +1,7 @@
 package com.weeznn.weeji.fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,6 +25,7 @@ import com.weeznn.mylibrary.utils.FileUtil;
 import com.weeznn.weeji.MyApplication;
 import com.weeznn.weeji.R;
 import com.weeznn.weeji.activity.DetailActivity;
+import com.weeznn.weeji.activity.MarkDownActivity;
 import com.weeznn.weeji.interfaces.UpdataFragmentDetailListener;
 import com.weeznn.weeji.util.db.DiaryDao;
 import com.weeznn.weeji.util.db.entry.Diary;
@@ -60,6 +62,7 @@ public class DairyDetailFragment extends Fragment {
     private long code;
     private Diary diary;
     private String txt;
+    private String title;
 
     private OnFragmentInteractionListener mListener;
 
@@ -113,7 +116,11 @@ public class DairyDetailFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: 2018/4/12 修改内容
+                Intent intent=new Intent(getContext(), MarkDownActivity.class);
+                intent.putExtra(MarkDownActivity.INTENT_FILE_NAME,title);
+                intent.putExtra(MarkDownActivity.INTENT_FILE_TYPE,FileUtil.FILE_TYPE_DAIRY);
+                intent.putExtra(MarkDownActivity.INTENT_FILE_DATA,txt);
+                startActivity(intent);
             }
         });
     }
@@ -147,7 +154,8 @@ public class DairyDetailFragment extends Fragment {
                 //读文件
                 readText(diary.getDate());
                 //toobar
-                toolbar.setTitle(diary.getDate());
+                title=diary.getDate();
+                toolbar.setTitle(title);
                 toolbar.setSubtitle(diary.getAddress());
 
                 //image

@@ -1,5 +1,6 @@
 package com.weeznn.weeji.fragment;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -13,14 +14,19 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -30,14 +36,16 @@ import com.weeznn.mylibrary.utils.FileUtil;
 import com.weeznn.weeji.MyApplication;
 import com.weeznn.weeji.R;
 import com.weeznn.weeji.activity.DetailActivity;
+import com.weeznn.weeji.activity.MarkDownActivity;
 import com.weeznn.weeji.interfaces.UpdataFragmentDetailListener;
 import com.weeznn.weeji.service.AudioIntentService;
 import com.weeznn.weeji.util.db.MeetingDao;
 import com.weeznn.weeji.util.db.entry.Meeting;
 
+import java.lang.reflect.Method;
 import java.util.List;
 
-public class MeetingDetailFragment extends Fragment implements View.OnClickListener {
+public class MeetingDetailFragment extends Fragment{
     private static final String TAG = "MeetingDetailFragment";
 
     private static final String ARG_PARAM1 = "CODE";
@@ -51,7 +59,6 @@ public class MeetingDetailFragment extends Fragment implements View.OnClickListe
 
     //view
     private AppBarLayout appBarLayout;
-    private FloatingActionButton player;
     private ProgressBar progressBar;
 
     private TextView titleView;
@@ -60,9 +67,8 @@ public class MeetingDetailFragment extends Fragment implements View.OnClickListe
     private TextView keyWord1View;
     private TextView keyWord2View;
     private TextView keyWord3View;
-    private TextView textView;
-    private ImageButton btnPlayer;
-    private TextView toolbarTitle;
+    private EditText textView;
+    private Toolbar toolbar;
 
 
     //逻辑
@@ -70,11 +76,14 @@ public class MeetingDetailFragment extends Fragment implements View.OnClickListe
     private Meeting meeting;
     private String txt;//正文
     private int playerState = PLAYER_PAUSE;
+    private boolean isEdit=false;
+    private String title="";
 
     private OnFragmentInteractionListener mListener;
 
     private LocalBroadcastManager localBroadcastManager;
     private MyAudioProgressResiver resiver;
+    private AudioIntentService audioIntentService;
 
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
@@ -92,9 +101,13 @@ public class MeetingDetailFragment extends Fragment implements View.OnClickListe
         return fragment;
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        setHasOptionsMenu(true);
+
         if (getArguments() != null) {
             code = getArguments().getLong(ARG_PARAM1);
             initInfo();
@@ -122,8 +135,8 @@ public class MeetingDetailFragment extends Fragment implements View.OnClickListe
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_meeting_detail, container, false);
         appBarLayout = view.findViewById(R.id.appbar);
-        player = view.findViewById(R.id.fab);
         progressBar = view.findViewById(R.id.progressbar);
+        toolbar=view.findViewById(R.id.toolbar);
 
         titleView = view.findViewById(R.id.title);
         timeView = view.findViewById(R.id.time);
@@ -132,29 +145,65 @@ public class MeetingDetailFragment extends Fragment implements View.OnClickListe
         keyWord2View = view.findViewById(R.id.key_word_2);
         keyWord3View = view.findViewById(R.id.key_word_3);
         textView = view.findViewById(R.id.text);
-        btnPlayer = view.findViewById(R.id.btn_player);
-        toolbarTitle = view.findViewById(R.id.toolbar_title);
+
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        //player
-        player.setOnClickListener(this);
-        btnPlayer.setOnClickListener(this);
 
-        //appbar
-        appBarLayout.addOnOffsetChangedListener(new MyOffsetChangeListener());
 
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        toolbar.setTitleTextColor(getResources().getColor(R.color.colorWright));
+
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                handleMenuItemClick(item);
+                return true;
+            }
+        });
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+    private void handleMenuItemClick(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.btn_player:
+                if (playerState == PLAYER_PAUSE) {
+                    Log.i(TAG, "开始播放");
+                    playerState = PLAYER_START;
+                    int i=AudioIntentService.ActionStart(getContext(),meeting.getTitle(),FileUtil.FILE_TYPE_MEETING);
+                    if (i!=AudioIntentService.RESULT_CODE_SUC){
+                        item.setVisible(false);
+                        Snackbar snackbar=Snackbar.make(textView,"音频无法播放",Snackbar.LENGTH_SHORT);
+                        snackbar.getView().setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+                        snackbar.show();
+                    }
+                    item.setIcon(R.drawable.ic_pause_black_24dp);
+                } else {
+                    Log.i(TAG, "暂停播放");
+                    playerState = PLAYER_PAUSE;
+                    AudioIntentService.ActionPause(getContext());
+                    item.setIcon(R.drawable.ic_play_arrow_black_24dp);
+                }
+                break;
+            case R.id.edit:
+                Intent intent=new Intent(getContext(), MarkDownActivity.class);
+                intent.putExtra(MarkDownActivity.INTENT_FILE_NAME,title);
+                intent.putExtra(MarkDownActivity.INTENT_FILE_TYPE,FileUtil.FILE_TYPE_MEETING);
+                intent.putExtra(MarkDownActivity.INTENT_FILE_DATA,txt);
+                startActivity(intent);
+                break;
         }
     }
+
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        Log.i(TAG,"onCreateOptionsMenu");
+        inflater.inflate(R.menu.meeting_detail_menu,menu);
+    }
+
 
     @Override
     public void onAttach(Context context) {
@@ -172,30 +221,7 @@ public class MeetingDetailFragment extends Fragment implements View.OnClickListe
         super.onDetach();
         mListener = null;
         localBroadcastManager.unregisterReceiver(resiver);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btn_player:
-            case R.id.fab:
-                if (playerState == PLAYER_PAUSE) {
-                    Log.i(TAG, "开始播放");
-                    playerState = PLAYER_START;
-                    player.setImageResource(R.drawable.ic_play_arrow_black_24dp);
-                    btnPlayer.setImageResource(R.drawable.ic_play_arrow_black_24dp);
-                    player.invalidate();
-                    btnPlayer.invalidate();
-                } else {
-                    Log.i(TAG, "暂停播放");
-                    playerState = PLAYER_PAUSE;
-                    player.setImageResource(R.drawable.ic_pause_black_24dp);
-                    btnPlayer.setImageResource(R.drawable.ic_pause_black_24dp);
-                    player.invalidate();
-                    btnPlayer.invalidate();
-                }
-                break;
-        }
+        AudioIntentService.ActionStop(getContext());
     }
 
     public interface OnFragmentInteractionListener {
@@ -208,13 +234,12 @@ public class MeetingDetailFragment extends Fragment implements View.OnClickListe
             case MSG_CODE_METTING_DB:
                 //读文件
                 readText(meeting.getTitle());
-                titleView.setText(meeting.getTitle());
+                toolbar.setTitle(meeting.getTitle());
                 timeView.setText(meeting.getTime());
                 addrView.setText(meeting.getAddress());
                 keyWord1View.setText(meeting.getKeyword1());
                 keyWord2View.setText(meeting.getKeyword2());
                 keyWord3View.setText(meeting.getKeyword3());
-                toolbarTitle.setText(meeting.getTitle());
                 break;
             case MSG_CODE_METTING_FILE:
                 textView.setText(txt);
@@ -262,40 +287,29 @@ public class MeetingDetailFragment extends Fragment implements View.OnClickListe
     /**
      * 滑动折叠监听器
      */
-    private class MyOffsetChangeListener implements AppBarLayout.OnOffsetChangedListener {
-        private final int EXPAND = 1;
-        private final int CLOOSE = 2;
-        private final int IDEO = 3;
-        private int currontState = IDEO;
-
-        @Override
-        public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-            if (verticalOffset == 0) {
-                if (currontState != EXPAND) {
-                    currontState = EXPAND;
-                    //展开状态  toolbar 不显示 fab显示
-                }
-                btnPlayer.setVisibility(View.GONE);
-                toolbarTitle.setVisibility(View.GONE);
-
-                player.setVisibility(View.VISIBLE);
-            } else if (Math.abs(verticalOffset) >= appBarLayout.getTotalScrollRange()) {
-                if (currontState != CLOOSE) {
-                    currontState = CLOOSE;
-                }
-                //闭合状态  toolbar显示  其他的不显示
-                btnPlayer.setVisibility(View.VISIBLE);
-                toolbarTitle.setVisibility(View.VISIBLE);
-
-                player.setVisibility(View.INVISIBLE);
-            } else {
-                currontState = IDEO;
-                toolbarTitle.setVisibility(View.GONE);
-                btnPlayer.setVisibility(View.INVISIBLE);
-
-            }
-        }
-    }
+//    private class MyOffsetChangeListener implements AppBarLayout.OnOffsetChangedListener {
+//        private final int EXPAND = 1;
+//        private final int CLOOSE = 2;
+//        private final int IDEO = 3;
+//        private int currontState = IDEO;
+//
+//        @Override
+//        public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+//            if (verticalOffset == 0) {
+//                if (currontState != EXPAND) {
+//                    currontState = EXPAND;
+//                    //展开状态  toolbar 不显示 fab显示
+//                }
+//            } else if (Math.abs(verticalOffset) >= appBarLayout.getTotalScrollRange()) {
+//                if (currontState != CLOOSE) {
+//                    currontState = CLOOSE;
+//                }
+//                //闭合状态  toolbar显示  其他的不显示
+//            } else {
+//                currontState = IDEO;
+//            }
+//        }
+//    }
 
     /**
      * 广播接收器  接收音频播放的进度条消息
@@ -304,6 +318,7 @@ public class MeetingDetailFragment extends Fragment implements View.OnClickListe
         @Override
         public void onReceive(Context context, Intent intent) {
             //填写进度条
+            Log.i(TAG,intent.getIntExtra(AudioIntentService.AUDIO_PROGRESS, 0)+"");
             progressBar.setProgress(intent.getIntExtra(AudioIntentService.AUDIO_PROGRESS, 0));
         }
     }

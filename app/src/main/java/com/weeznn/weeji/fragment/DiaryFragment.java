@@ -15,6 +15,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.telephony.IccOpenLogicalChannelResponse;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +23,11 @@ import android.view.ViewStub;
 import android.widget.TextView;
 
 import com.weeznn.mylibrary.utils.Constant;
+import com.weeznn.mylibrary.utils.FileUtil;
 import com.weeznn.weeji.MyApplication;
 import com.weeznn.weeji.R;
 import com.weeznn.weeji.activity.DetailActivity;
+import com.weeznn.weeji.activity.MarkDownActivity;
 import com.weeznn.weeji.adpater.DiaryAdapter;
 import com.weeznn.weeji.adpater.MettingAdapter;
 import com.weeznn.weeji.interfaces.ItemClickListener;
@@ -68,7 +71,7 @@ public class DiaryFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.fragment_metting, container, false);
+        View view=inflater.inflate(R.layout.fragment_dairy, container, false);
         recyclerView=view.findViewById(R.id.recyclerView);
         refreshLayout=view.findViewById(R.id.freshLayout);
         toolbar=view.findViewById(R.id.toolbar);
@@ -99,13 +102,14 @@ public class DiaryFragment extends Fragment implements
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         //toolbar
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        toolbatTitle.setText("笔记");
+        toolbatTitle.setText("日记");
 
         //fab
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: 2018/4/4 添加
+               Intent intent=new Intent(v.getContext(), MarkDownActivity.class);
+               startActivityForResult(intent,REQUEST_CODE_DIA);
             }
         });
     }
@@ -148,4 +152,14 @@ public class DiaryFragment extends Fragment implements
     public void onItemLongClick(int position) {
 
     }
+
+//    @Override
+//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if (requestCode==REQUEST_CODE_DIA){
+//            if (resultCode==RESOULT_CODE_DOWN){
+//                // TODO: 2018/4/17
+//            }
+//        }
+//    }
 }

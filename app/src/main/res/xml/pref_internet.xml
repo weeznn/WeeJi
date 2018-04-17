@@ -2,4 +2,15 @@
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <SwitchPreference
+        android:key="only_wifi"
+        android:title="@string/pref_intent_only_wifi"/>
+    <SwitchPreference
+        android:key="4G_asr"
+        android:title="@string/pref_intent_4G_asr"
+        android:summary="@string/pref_intent_4G_asr_sub"/>
+    <SwitchPreference
+        android:key="4G_nlp"
+        android:title="@string/pref_intent_4G_nlp"
+        android:summary="@string/pref_intent_4G_nlp_sub"/>
 </PreferenceScreen>

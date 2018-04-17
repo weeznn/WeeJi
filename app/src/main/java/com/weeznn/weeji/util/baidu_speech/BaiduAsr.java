@@ -14,6 +14,7 @@ import com.baidu.speech.asr.SpeechConstant;
 import com.weeznn.mylibrary.utils.Constant;
 import com.weeznn.mylibrary.utils.FileUtil;
 import com.weeznn.weeji.activity.ASRActivity;
+import com.weeznn.weeji.service.NLPIntentService;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -88,32 +89,6 @@ public class BaiduAsr implements Constant {
             throw new RuntimeException("EventManager or EventListener is null ");
         }
     }
-
-//    /**
-//     * 暂停
-//     */
-//    public void stop(){
-//        Log.i(TAG,"pause");
-//        if (eventManager != null) {
-//            eventManager.send(SpeechConstant.ASR_STOP, "{}", null, 0, 0);
-//            eventManager.unregisterListener(listener);
-//        } else {
-//            throw new RuntimeException("EventManager or EventListener is null");
-//        }
-//
-//    }
-//    /**
-//     * 重启
-//     */
-//    public void reStart(){
-//        Log.i(TAG,"restart");
-//        if (eventManager != null && listener != null) {
-//            eventManager.send(SpeechConstant.ASR_START, jsonObject.toString(), null, 0, 0);
-//            eventManager.registerListener(listener);
-//        } else {
-//            throw new RuntimeException("EventManager or EventListener is null ");
-//        }
-//    }
 
     /**
      * 取消本次识别，将path目录下的数据清除
@@ -266,7 +241,7 @@ public class BaiduAsr implements Constant {
 
                     break;
                 case SpeechConstant.CALLBACK_EVENT_ASR_FINISH:
-                    //识别结果
+                    //识别结束
                     Log.i(TAG, Thread.currentThread().getId() + "回调  识别结果finish  " + s1);
 
                     break;

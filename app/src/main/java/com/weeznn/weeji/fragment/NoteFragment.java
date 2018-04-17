@@ -21,9 +21,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.weeznn.mylibrary.utils.Constant;
+import com.weeznn.mylibrary.utils.FileUtil;
 import com.weeznn.weeji.MyApplication;
 import com.weeznn.weeji.R;
 import com.weeznn.weeji.activity.DetailActivity;
+import com.weeznn.weeji.activity.MarkDownActivity;
 import com.weeznn.weeji.adpater.NoteAdapter;
 import com.weeznn.weeji.interfaces.ItemClickListener;
 import com.weeznn.weeji.util.db.NoteDao;
@@ -106,7 +108,9 @@ public class NoteFragment extends Fragment implements
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: 2018/4/4 添加
+                Intent intent=new Intent(v.getContext(), MarkDownActivity.class);
+                intent.putExtra(MarkDownActivity.INTENT_FILE_TYPE, FileUtil.FILE_TYPE_NOTE);
+                startActivityForResult(intent,REQUEST_CODE_DIA);
             }
         });
     }

@@ -1,12 +1,16 @@
 package com.weeznn.weeji.activity;
 
 import android.Manifest;
+import android.app.usage.UsageEvents;
+import android.arch.lifecycle.Lifecycle;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.CalendarContract;
+import android.provider.ContactsContract;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -14,6 +18,8 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.format.DateUtils;
+import android.util.EventLog;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -26,14 +32,17 @@ import android.widget.TextView;
 
 import com.baidu.speech.EventManagerFactory;
 import com.weeznn.mylibrary.utils.Constant;
+import com.weeznn.mylibrary.utils.DataUtil;
 import com.weeznn.mylibrary.utils.FileUtil;
 import com.weeznn.mylibrary.utils.baidu_nlp.BaiduNlp;
 import com.weeznn.weeji.adpater.PopupItemAdapter;
+import com.weeznn.weeji.interfaces.ItemClickListener;
 import com.weeznn.weeji.service.NLPIntentService;
 import com.weeznn.weeji.util.baidu_speech.BaiduAsr;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -173,7 +182,7 @@ public class ASRActivity extends BaseActivity implements Constant,
             @Override
             public void run() {
                 Log.i(TAG, "writing...");
-                FileUtil.WriteText(FILE_TYPE_MEETING, fileName, FileUtil.FILE_TYPE_JSON, peoples);
+                FileUtil.WriteText(FILE_TYPE_MEETING, fileName, FileUtil.TYPE_JSON, peoples);
             }
         }).start();
     }
@@ -265,11 +274,12 @@ public class ASRActivity extends BaseActivity implements Constant,
 
         //识别完毕 开始自动获取摘要
         NLPIntentService.startActionSUM(context);
+
         //写文件
         new Thread(new Runnable() {
             @Override
             public void run() {
-                FileUtil.WriteText(fileType, fileName, FileUtil.FILE_TYPE_TEXT, stringBuilder.toString());
+                FileUtil.WriteText(fileType, fileName, FileUtil.TYPE_TEXT, stringBuilder.toString());
             }
         }).start();
 
@@ -281,7 +291,7 @@ public class ASRActivity extends BaseActivity implements Constant,
      */
     private void initPopupWindow() {
         View popview = LayoutInflater.from(ASRActivity.this).inflate(R.layout.popupwindowlist, null);
-        PopupWindow popupWindow = new PopupWindow(ASRActivity.this);
+        final PopupWindow popupWindow = new PopupWindow(ASRActivity.this);
         popupWindow.setContentView(popview);
         popupWindow.setHeight(getResources().getDisplayMetrics().heightPixels * 2 / 3);
         popupWindow.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
@@ -310,12 +320,52 @@ public class ASRActivity extends BaseActivity implements Constant,
         layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         recyclerViewH.setLayoutManager(layoutManager);
         recyclerViewH.addItemDecoration(new DividerItemDecoration(recyclerViewH.getContext(), DividerItemDecoration.HORIZONTAL));
-        recyclerViewH.setAdapter(new PopupItemAdapter(keylist, recyclerViewH.getContext(), PopupItemAdapter.TYPE.RecyclerH));
+        PopupItemAdapter adapterH=new PopupItemAdapter(keylist, recyclerViewH.getContext(), PopupItemAdapter.TYPE.RecyclerH);
+        recyclerViewH.setAdapter(adapterH);
+        adapterH.setItemClickListener(new ItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                //点击了该item keyword
+                if (keyWords.length<3){
+                    keyWords[keyWords.length]=keylist.get(position);
+                }
+            }
+
+            @Override
+            public void onItemLongClick(int position) {
+
+            }
+        });
 
         RecyclerView recyclerViewV = popview.findViewById(R.id.recycler_v);
         recyclerViewV.setLayoutManager(new LinearLayoutManager(recyclerViewV.getContext()));
         recyclerViewV.addItemDecoration(new DividerItemDecoration(recyclerViewH.getContext(), DividerItemDecoration.VERTICAL));
-        recyclerViewV.setAdapter(new PopupItemAdapter(keylist, recyclerViewV.getContext(), PopupItemAdapter.TYPE.RecyclerV));
+        PopupItemAdapter adapterV=new PopupItemAdapter(interPointlist, recyclerViewV.getContext(), PopupItemAdapter.TYPE.RecyclerV);
+        recyclerViewV.setAdapter(adapterV);
+        adapterV.setItemClickListener(new ItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                // TODO: 2018/4/17 点击了该item 添加到日历
+                Intent intent=new Intent(Intent.ACTION_INSERT)
+                        .setData(CalendarContract.Events.CONTENT_URI)
+                        .putExtra(CalendarContract.Events.TITLE,fileName)
+                        .putExtra(CalendarContract.Events.DESCRIPTION,filesub);
+                if (interPointlist.get(position).split("#")[1]==LOC){
+                    intent.putExtra(CalendarContract.Events.EVENT_LOCATION,interPointlist.get(position).split("#")[0]);
+                }
+                if (interPointlist.get(position).split("#")[1]==TIME){
+                    intent.putExtra(CalendarContract.Events.EVENT_END_TIMEZONE, new Date().getTime()/1000);
+                }
+                startActivity(intent);
+            }
+
+            @Override
+            public void onItemLongClick(int position) {
+
+            }
+        });
+
+
 
         Button button = popview.findViewById(R.id.btn);
         button.setOnClickListener(new View.OnClickListener() {
@@ -334,6 +384,7 @@ public class ASRActivity extends BaseActivity implements Constant,
                 intent.putExtra("result", bundle);
                 setResult(RESOULT_CODE_DOWN, intent);
                 // TODO: 2018/4/7 结束本activity前去判断是否写完了
+                popupWindow.dismiss();
                 finish();
             }
         });
@@ -343,10 +394,16 @@ public class ASRActivity extends BaseActivity implements Constant,
      * NLP 获取关键字
      */
     private void initPopupData() {
-        keylist = BaiduNlp.keyWord(fileName, stringBuilder.toString());
-        keylist.addAll(BaiduNlp.topic(fileName, stringBuilder.toString()));
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                keylist = BaiduNlp.keyWord(fileName, stringBuilder.toString());
+                keylist.addAll(BaiduNlp.topic(fileName, stringBuilder.toString()));
+                interPointlist.addAll(NLPIntentService.getWordSet());
+                handler.sendEmptyMessage(MSG_BAIDUNLP_KEYW);
+            }
+        }).start();
 
-        handler.sendEmptyMessage(MSG_BAIDUNLP_KEYW);
     }
 
     @Override

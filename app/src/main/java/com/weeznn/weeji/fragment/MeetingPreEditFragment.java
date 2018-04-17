@@ -81,8 +81,6 @@ public class MeetingPreEditFragment extends Fragment implements Constant{
         String json = getArguments().getString(FLAG_PEOPLES);
         Log.i(TAG,"arg :"+json);
         list.clear();
-        list = SimplePeople.getListFromJson(json);
-
 
         if (savedInstanceState != null && !"".equals(savedInstanceState.getString(FLAG_PEOPLES))) {
             String json1 = savedInstanceState.getString(KEY_PEOPLELIST);
@@ -90,6 +88,8 @@ public class MeetingPreEditFragment extends Fragment implements Constant{
             list.addAll(SimplePeople.getListFromJson(json1));
             sub = savedInstanceState.getString(KEY_SUB);
             title = savedInstanceState.getString(KEY_TITLE);
+        }else {
+            list = SimplePeople.getListFromJson(json);
         }
     }
 
@@ -120,11 +120,11 @@ public class MeetingPreEditFragment extends Fragment implements Constant{
                 peopleListFragment.setArguments(bundle);
 
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                transaction.addToBackStack(MeetingPreEditFragment.TAG_BACK);
-                transaction.hide(fragment);
-                transaction.setCustomAnimations(R.animator.fragment_enter_from_bottom,R.animator.fragment_exit_to_left);
-                transaction.add(R.id.frameLayout,peopleListFragment , PeopleListFragment.TAG_BACK);
-                transaction.commit();
+                transaction.addToBackStack(MeetingPreEditFragment.TAG_BACK)
+                        .hide(fragment)
+                        .setCustomAnimations(R.animator.fragment_enter_from_bottom,R.animator.fragment_exit_to_left)
+                        .add(R.id.frameLayout,peopleListFragment , PeopleListFragment.TAG_BACK)
+                        .commit();
             }
         });
         //textview

@@ -5,6 +5,15 @@ import android.content.Intent;
 import android.content.Context;
 import android.util.Log;
 
+import com.weeznn.mylibrary.utils.baidu_nlp.BaiduNlp;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 public class NLPIntentService extends IntentService {
     private static final String TAG=NLPIntentService.class.getSimpleName();
     private static final String ACTION_CLIPWORD = "com.weeznn.weeji.service.action.ClipWord";
@@ -13,6 +22,10 @@ public class NLPIntentService extends IntentService {
 
     // TODO: Rename parameters
     private static final String SENTENCE = "com.weeznn.weeji.service.extra.PARAM1";
+
+
+    //专业名词
+    static Set<String> wordSet=new HashSet<>();
 
     public NLPIntentService() {
         super("NLPIntentService");
@@ -66,7 +79,7 @@ public class NLPIntentService extends IntentService {
      */
     private void handleActionPrepare() {
         Log.i(TAG,"handleActionPrepare");
-        throw new UnsupportedOperationException("Not yet implemented");
+
     }
 
     /**
@@ -75,7 +88,15 @@ public class NLPIntentService extends IntentService {
      */
     private void handleActionClipWord(String param1) {
         Log.i(TAG,"handleActionClipWord");
-        throw new UnsupportedOperationException("Not yet implemented");
+        wordSet.addAll(BaiduNlp.lexer(param1));
+    }
+
+    /**
+     * 返回整篇的专业名词
+     * @return
+     */
+    public static Set<String> getWordSet() {
+        return wordSet;
     }
 
     /**
@@ -83,6 +104,6 @@ public class NLPIntentService extends IntentService {
      */
     private void handleActionSum() {
         Log.i(TAG,"handleActionSum");
-        throw new UnsupportedOperationException("Not yet implemented");
+
     }
 }

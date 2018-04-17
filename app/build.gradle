@@ -46,4 +46,5 @@ dependencies {
     compile 'org.greenrobot:greendao:3.2.2'
     implementation project(':mylibrary')
     implementation files('libs/bdasr_V3_20171108_9800a2a.jar')
+    compile 'com.zzhoujay.richtext:richtext:3.0.7'
 }

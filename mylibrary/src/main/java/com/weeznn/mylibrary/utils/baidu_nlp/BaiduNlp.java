@@ -44,38 +44,35 @@ public class BaiduNlp {
     }
 
     /**
-     * 对句子进行词法分析，从中获取到人名|地名|时间|命名实体|机构名|
+     * 对句子进行分词处理，
      * @param text
      * @return
      */
-    public static List<Lexer> lexer(String text){
+    public static List<String> lexer(String text){
         Log.i(TAG,"词法分析:  text:"+text);
-        List<Lexer> lexerList=new ArrayList<>();
+        List<String> proWordList=new ArrayList<>();
 
         HashMap<String,Object>options=new HashMap<>();
         JSONObject res=BaiduNlp.getInstance().lexer(text,options);
         Log.i(TAG,"词法分析结果："+res.toString());
 
         try {
-            String sentence=res.getJSONObject("results").getString("text");
             JSONArray jsonArray=res.getJSONObject("results").getJSONArray("items");
             for (int i=0;i<jsonArray.length();i++){
                 JSONObject object=jsonArray.getJSONObject(i);
-                if (object.getString("ne")!=null){
-                    lexerList.add(new Lexer(object.getString("item"),
-                            object.getString("ne"),
-                            object.getString(sentence)));
-                }
                 if (object.getString("uri")!=null){
-                    lexerList.add(new Lexer(object.getString("item"),
-                            "URI",
-                            object.getString(sentence)));
+                    //命名实体
+                   proWordList.add(object.getString("item")+"|"+object.getString("uri"));
+                }
+                if (object.getString("ne")!=null){
+                    //专名
+                    proWordList.add(object.getString("item")+"#"+object.getString("ne"));
                 }
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return lexerList;
+        return proWordList;
     }
 
 

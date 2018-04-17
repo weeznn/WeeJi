@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -166,11 +167,11 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_self:
                 //自我信息
-                Fragment fragment = new PeopleDetailFragment();
-                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                transaction.replace(R.id.frameLayout,fragment, PeopleDetailFragment.FLAG_BACK);
-                transaction.addToBackStack(defFragment.getTag());
-                transaction.commit();
+                Intent intent1=new Intent(this,DetailActivity.class);
+                intent1.putExtra(getString(R.string.LEFT_TYPE),CODE_PEO);
+                intent1.putExtra(getString(R.string.LEFT_CODE),Long.MAX_VALUE);
+                startActivity(intent1);
+
                 drawerLayout.closeDrawer(GravityCompat.START);
                 break;
         }
