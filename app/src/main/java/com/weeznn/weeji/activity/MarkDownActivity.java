@@ -27,6 +27,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.weeznn.mylibrary.utils.Constant;
 import com.weeznn.mylibrary.utils.DataUtil;
 import com.weeznn.mylibrary.utils.FileUtil;
 import com.weeznn.weeji.R;
@@ -36,7 +37,8 @@ import com.zzhoujay.richtext.RichText;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class MarkDownActivity extends AppCompatActivity implements BtnAdaptar.ItemClickListener {
+public class MarkDownActivity extends AppCompatActivity
+        implements BtnAdaptar.ItemClickListener {
     private static final String TAG = MarkDownActivity.class.getSimpleName();
     private static final int REQUEST_CODE_IMAGE=1;
     private static final String IMAGE_MD_STRING="IMAGE_MD_STRING";
@@ -56,17 +58,23 @@ public class MarkDownActivity extends AppCompatActivity implements BtnAdaptar.It
         @Override
         public boolean handleMessage(Message msg) {
             progressBar.setVisibility(View.GONE);
-
-            Snackbar.make(scrollEdit,"文件已保存到本地！",Snackbar.LENGTH_SHORT).show();
-            finish();
+            Intent intent =new Intent();
+            Bundle bundle=new Bundle();
+            setbundle(bundle);
+            intent.putExtra("result",bundle);
+            setResult(RESULT_OK,intent);
             return true;
         }
     });
+
+
 
     private String preFlg = "";
     private String filename;
     private String fileType;
     private String file;
+    private String date;
+    private String imagePath;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +86,10 @@ public class MarkDownActivity extends AppCompatActivity implements BtnAdaptar.It
                 filename = getIntent().getStringExtra(INTENT_FILE_NAME);
             }else {
                 SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm");
-                filename= format.format(new Date());
+                date=format.format(new Date());
+                filename= date;
             }
+            Log.i(TAG,filename);
             if (getIntent().getStringExtra(INTENT_FILE_TYPE) != null){
                 fileType = getIntent().getStringExtra(INTENT_FILE_TYPE);
             }else {
@@ -107,7 +117,12 @@ public class MarkDownActivity extends AppCompatActivity implements BtnAdaptar.It
         btnAdaptar.setItemClickListener(this);
 
         editText.setFocusable(true);
-        editText.append("## "+filename);
+        if (file!=null && "".equals(file)){
+            editText.append(file);
+        }else {
+            editText.append("## "+filename);
+        }
+
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -130,7 +145,8 @@ public class MarkDownActivity extends AppCompatActivity implements BtnAdaptar.It
         });
 
         setSupportActionBar(toolbar);
-
+        toolbar.setTitle("");
+        toolbar.setNavigationIcon(R.drawable.ic_company);
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
@@ -176,6 +192,7 @@ public class MarkDownActivity extends AppCompatActivity implements BtnAdaptar.It
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+
                         FileUtil.WriteText(fileType,filename, FileUtil.TYPE_MD,editText.getText().toString());
                         handler.sendEmptyMessage(1);
                     }
@@ -266,12 +283,50 @@ public class MarkDownActivity extends AppCompatActivity implements BtnAdaptar.It
                         String string=cursor.getString(index);//图片本地路径
                         cursor.close();//guanbi
                         FileUtil.copyImage(string,uri.hashCode()+"",FileUtil.FILE_TYPE_HEAD);//将图片压缩保存
-                        String photo= FileUtil.SAVE_IMAGE+uri.hashCode()+".jpg";//重新命名图片路径
-                        insertString.replace("图片地址",photo);
+                        imagePath = FileUtil.SAVE_IMAGE+uri.hashCode()+".jpg";//重新命名图片路径
+                        insertString.replace("图片地址",imagePath);
                         editText.append(insertString);
                     }
                 }
             }
+        }
+    }
+
+
+    private void setbundle(Bundle bundle) {
+        switch (fileType){
+            case FileUtil.FILE_TYPE_DAIRY:
+                bundle.putString(getString(R.string.TABLE_DAI_date),date);
+                bundle.putString(getString(R.string.TABLE_DAI_address),"");
+                bundle.putString(getString(R.string.TABLE_DAI_mood),"");
+                bundle.putString(getString(R.string.TABLE_DAI_image),imagePath);
+                break;
+            case FileUtil.FILE_TYPE_MEETING:
+                if (filename!=null && "".equals(filename)){
+                    filename="未命名的会议"+date.hashCode();
+                    filename=filename.substring(0,10);
+                }
+                bundle.putLong(getString(R.string.TABLE_MET_metID),filename.hashCode());
+                bundle.putString(getString(R.string.TABLE_MET_title),filename);
+                bundle.putString(getString(R.string.TABLE_MET_time),date);
+                bundle.putString(getString(R.string.TABLE_MET_sub),"");
+                bundle.putString(getString(R.string.TABLE_MET_address),"");
+                bundle.putString(getString(R.string.TABLE_MET_keyword1),"");
+                bundle.putString(getString(R.string.TABLE_MET_keyword2),"");
+                bundle.putString(getString(R.string.TABLE_MET_keyword3),"");
+                bundle.putString(getString(R.string.TABLE_MET_modetator),"");
+                break;
+            case FileUtil.FILE_TYPE_NOTE:
+                if (filename!=null && "".equals(filename)){
+                    filename="未命名的笔记本"+date.hashCode();
+                    filename=filename.substring(0,10);
+                }
+                bundle.putLong(getString(R.string.TABLE_NOT_noteID),filename.hashCode());
+                bundle.putString(getString(R.string.TABLE_NOT_image),imagePath);
+                bundle.putString(getString(R.string.TABLE_NOT_sub),"");
+                bundle.putString(getString(R.string.TABLE_NOT_time),date);
+                bundle.putString(getString(R.string.TABLE_NOT_source),filename);
+                break;
         }
     }
 }

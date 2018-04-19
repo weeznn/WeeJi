@@ -57,9 +57,16 @@
             android:exported="false" />
         <service
             android:name=".service.NLPIntentService"
-            android:exported="false"/>
-        <activity android:name=".activity.MarkDownActivity"
-            android:exported="false"/>
+            android:exported="false" />
+
+        <activity
+            android:name=".activity.MarkDownActivity"
+            android:exported="false" />
+
+        <service
+            android:name=".service.AudioService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

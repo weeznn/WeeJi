@@ -45,6 +45,7 @@ public class AudioIntentService extends IntentService {
     private static FileAudioInputStream audioInputStream;
     private static String path;
     private AudioTrack player;
+    private boolean play=true;
 
 
     private byte[] pauseData ;
@@ -148,6 +149,7 @@ public class AudioIntentService extends IntentService {
      */
     private void handleActionPause() {
         Log.i(TAG,"handleActionPause");
+        play=false;
         if (player != null) {
             player.pause();
             player.flush();
@@ -159,6 +161,7 @@ public class AudioIntentService extends IntentService {
      */
     private void handleActionStart() {
         // 准备播放器
+        play=true;
         byte[] data = new byte[bufsize];
         if (player == null) {
             player = new AudioTrack(AudioManager.STREAM_MUSIC,
@@ -175,7 +178,7 @@ public class AudioIntentService extends IntentService {
             player.write(data, 0, data.length);
         }
         try {
-            while (audioInputStream.read(data, 0, bufsize) != -1) {
+            while (play && audioInputStream.read(data, 0, bufsize) != -1) {
                 pauseData = data.clone();
                 player.write(data, 0, data.length);
                 bufOffset += data.length;

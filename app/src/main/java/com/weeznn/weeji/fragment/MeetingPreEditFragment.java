@@ -36,16 +36,14 @@ import com.weeznn.mylibrary.utils.FileUtil;
 import com.weeznn.weeji.R;
 import com.weeznn.weeji.activity.ASRActivity;
 import com.weeznn.weeji.util.SimplePeople;
-import com.weeznn.weeji.util.db.entry.People;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MeetingPreEditFragment extends Fragment implements Constant{
+public class MeetingPreEditFragment extends Fragment implements Constant {
     private static final String TAG = MeetingPreEditFragment.class.getSimpleName();
     public static final String TAG_BACK = "MeetingPreEdit";
     public static final String FLAG_PEOPLES = "peoples";
@@ -63,34 +61,30 @@ public class MeetingPreEditFragment extends Fragment implements Constant{
     private ActionBar actionBar;
 
     //逻辑
-    private List<SimplePeople> list=new LinkedList<>();
+    private List<SimplePeople> data = new LinkedList<>();
     private String title;
     private String sub;
     private Fragment fragment;
+    private PreEditAdapter adapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate");
-
-        fragment=this;
-
         //该方法可以让toolbar的显示正常
         setHasOptionsMenu(true);
-        //获取参会人信息
-        String json = getArguments().getString(FLAG_PEOPLES);
-        Log.i(TAG,"arg :"+json);
-        list.clear();
+        fragment = this;
+
+        data.clear();
 
         if (savedInstanceState != null && !"".equals(savedInstanceState.getString(FLAG_PEOPLES))) {
             String json1 = savedInstanceState.getString(KEY_PEOPLELIST);
-
-            list.addAll(SimplePeople.getListFromJson(json1));
+            data.addAll(SimplePeople.getListFromJson(json1));
             sub = savedInstanceState.getString(KEY_SUB);
             title = savedInstanceState.getString(KEY_TITLE);
-        }else {
-            list = SimplePeople.getListFromJson(json);
         }
+
+        adapter = new PreEditAdapter(getContext(), data);
     }
 
     @Override
@@ -113,17 +107,29 @@ public class MeetingPreEditFragment extends Fragment implements Constant{
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO: 2018/4/3 添加动画
-                Fragment peopleListFragment=new PeopleListFragment();
-                Bundle bundle=new Bundle();
-                bundle.putInt(PeopleListFragment.LIST_TYPE,PeopleListFragment.LIST_TYPE_SELETE);
+                Fragment peopleListFragment = new PeopleListFragment();
+                Bundle bundle = new Bundle();
+                bundle.putInt(PeopleListFragment.LIST_TYPE, PeopleListFragment.LIST_TYPE_SELETE);
                 peopleListFragment.setArguments(bundle);
+                ((PeopleListFragment) peopleListFragment).setSeletedPeople(data);
+
+                ((PeopleListFragment) peopleListFragment).setSeletedListChangeListener(new SimpeopleListChangelistener() {
+                    @Override
+                    public void changed(List<SimplePeople> list) {
+                        Log.i(TAG, "data  changed size:" + list.size());
+
+                        data.clear();
+                        data.addAll(list);
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+
 
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                 transaction.addToBackStack(MeetingPreEditFragment.TAG_BACK)
-                        .hide(fragment)
-                        .setCustomAnimations(R.animator.fragment_enter_from_bottom,R.animator.fragment_exit_to_left)
-                        .add(R.id.frameLayout,peopleListFragment , PeopleListFragment.TAG_BACK)
+                        .remove(fragment)
+                        .setCustomAnimations(R.animator.fragment_enter_from_bottom, R.animator.fragment_exit_to_left)
+                        .add(R.id.frameLayout, peopleListFragment, PeopleListFragment.TAG_BACK)
                         .commit();
             }
         });
@@ -132,19 +138,18 @@ public class MeetingPreEditFragment extends Fragment implements Constant{
         subView.setText(sub);
         //recyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(new PreEditAdapter(getContext(), list));
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
+        recyclerView.setAdapter(adapter);
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 
         //toolbar
-        // TODO: 2018/4/4 有时间升级
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        actionBar= ((AppCompatActivity)getActivity()).getSupportActionBar();
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         toolbar.setNavigationIcon(R.drawable.ic_arrow_left);
         toolbar.setTitle(null);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentManager manager=getActivity().getSupportFragmentManager();
+                FragmentManager manager = getActivity().getSupportFragmentManager();
                 manager.popBackStack();
                 manager.beginTransaction().show(manager.findFragmentByTag(MettingFragment.TAG_BACK));
 
@@ -157,7 +162,7 @@ public class MeetingPreEditFragment extends Fragment implements Constant{
         super.onSaveInstanceState(outState);
         outState.putString(KEY_TITLE, titleView.getText().toString());
         outState.putString(KEY_SUB, subView.getText().toString());
-        outState.putString(KEY_PEOPLELIST, SimplePeople.list2String(list));
+        outState.putString(KEY_PEOPLELIST, SimplePeople.list2String(data));
 
         Log.i(TAG, "onSaveInstanceState");
     }
@@ -166,34 +171,34 @@ public class MeetingPreEditFragment extends Fragment implements Constant{
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         menu.clear();
-        inflater.inflate(R.menu.only_yes_menu,menu);
+        inflater.inflate(R.menu.only_yes_menu, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        if (item.getItemId()==R.id.yes){
-            String json=SimplePeople.list2String(list);
+        if (item.getItemId() == R.id.yes) {
+            String json = SimplePeople.list2String(data);
             //转到百度语音
-            Intent intent=new Intent(getActivity(), ASRActivity.class);
-            if (intent!=null){
-                Log.i(TAG,"GO TO BAIDU ASR");
-                intent.putExtra("title",titleView.getText().toString());
-                intent.putExtra("sub",subView.getText().toString());
-                intent.putExtra("type",FileUtil.FILE_TYPE_MEETING);
-                intent.putExtra("peoples",json);
+            Intent intent = new Intent(getActivity(), ASRActivity.class);
+            if (intent != null) {
+                Log.i(TAG, "GO TO BAIDU ASR");
+                intent.putExtra("title", titleView.getText().toString());
+                intent.putExtra("sub", subView.getText().toString());
+                intent.putExtra("type", FileUtil.FILE_TYPE_MEETING);
+                intent.putExtra("peoples", json);
 
-                getActivity().startActivityForResult(intent,REQUEST_CODE_MET);
+                getActivity().startActivityForResult(intent, REQUEST_CODE_MET);
             }
 
-            Log.i(TAG,"PRE EDIT DOWN");
+            Log.i(TAG, "PRE EDIT DOWN");
         }
         return true;
     }
 
 
     private class PreEditAdapter extends RecyclerView.Adapter<PreEditViewHolder> {
-        private final String TAG=PreEditAdapter.class.getSimpleName();
+        private final String TAG = PreEditAdapter.class.getSimpleName();
 
         private List<SimplePeople> data;
         private LayoutInflater inflater;
@@ -229,7 +234,7 @@ public class MeetingPreEditFragment extends Fragment implements Constant{
                 }
             });
 
-            RequestOptions options=new RequestOptions()
+            RequestOptions options = new RequestOptions()
                     .placeholder(R.drawable.ic_user_black)
                     .circleCrop()
                     .error(R.drawable.ic_user_black);
@@ -239,7 +244,7 @@ public class MeetingPreEditFragment extends Fragment implements Constant{
                     .into(viewHolder.imageView);
 
             viewHolder.name.setText(people.getName());
-            viewHolder.job.setText(people.getCompany()+" | "+people.getJob());
+            viewHolder.job.setText(people.getCompany() + " | " + people.getJob());
         }
 
 
@@ -260,11 +265,16 @@ public class MeetingPreEditFragment extends Fragment implements Constant{
         public PreEditViewHolder(View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.name);
-            job=itemView.findViewById(R.id.job);
+            job = itemView.findViewById(R.id.job);
             btn = itemView.findViewById(R.id.btn);
             imageView = itemView.findViewById(R.id.image);
             layout = itemView.findViewById(R.id.card);
         }
+    }
+
+
+    public interface SimpeopleListChangelistener {
+        void changed(List<SimplePeople> list);
     }
 
 }

@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -207,14 +208,14 @@ public class MainActivity extends AppCompatActivity
                                     dao.insert(
                                             new Meeting(
                                                     Long.decode(bundle.getString(getResources().getString(R.string.TABLE_MET_metID),"未命名".hashCode()+"")),
-                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_time),""),
-                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_title),""),
-                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_sub),""),
-                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_keyword1),""),
-                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_keyword2),""),
-                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_keyword3),""),
-                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_address),""),
-                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_modetator),"")
+                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_time),"会议时间"),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_title),"议题"),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_sub),"简介"),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_keyword1),"关键词1"),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_keyword2),"关键词2"),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_keyword3),"关键词3"),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_address),"地址"),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_MET_modetator),"主持人")
                                             ));
                                 }
                             });
@@ -252,7 +253,7 @@ public class MainActivity extends AppCompatActivity
                                             new Note(
                                                     Long.decode(bundle.getString(getResources().getString(R.string.TABLE_NOT_noteID),"未命名".hashCode()+"")),
                                                     bundle.getString(getResources().getString(R.string.TABLE_NOT_time),""),
-                                                    bundle.getString(getResources().getString(R.string.TABLE_NOT_cache),""),
+                                                    bundle.getString(getResources().getString(R.string.TABLE_NOT_image),""),
                                                     bundle.getString(getResources().getString(R.string.TABLE_NOT_sub),""),
                                                     bundle.getString(getResources().getString(R.string.TABLE_NOT_source),"")
                                             ));

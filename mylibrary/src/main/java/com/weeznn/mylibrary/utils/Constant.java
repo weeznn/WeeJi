@@ -7,6 +7,7 @@ package com.weeznn.mylibrary.utils;
 public interface Constant {
     //打开百度语音服务时的请求码
     int REQUEST_CODE_MET = 1;
+    int REQUEST_CODE_MET_EDIT = 4;
     int REQUEST_CODE_DIA = 2;
     int REQUEST_CODE_NOT = 3;
 

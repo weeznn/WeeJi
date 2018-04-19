@@ -205,7 +205,7 @@ public class FileUtil {
                 fileName;
         File filedir=new File(dirpath);
         if (!filedir.exists()){
-            filedir.mkdir();
+            makeDir(dirpath);
         }
 
         String path = dirpath + "/"+fileName+filetype;

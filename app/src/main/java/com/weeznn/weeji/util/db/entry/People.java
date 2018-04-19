@@ -1,22 +1,26 @@
 package com.weeznn.weeji.util.db.entry;
 
 import org.greenrobot.greendao.annotation.Entity;
+import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Generated;
 
 /**
- * Created by weeznn on 2018/3/30.
+ * Created by weeznn on 2018/4/19.
  */
 
 @Entity
 public class People {
-    private String phone;
+
+    @Id
+    private long phone;
     private String name;
     private String email;
     private String photo;
     private String company;
     private String job;
-    @Generated(hash = 171753250)
-    public People(String phone, String name, String email, String photo,
+
+    @Generated(hash = 1222984958)
+    public People(long phone, String name, String email, String photo,
             String company, String job) {
         this.phone = phone;
         this.name = name;
@@ -25,15 +29,13 @@ public class People {
         this.company = company;
         this.job = job;
     }
-
     @Generated(hash = 1406030881)
     public People() {
     }
-
-    public String getPhone() {
+    public long getPhone() {
         return this.phone;
     }
-    public void setPhone(String phone) {
+    public void setPhone(long phone) {
         this.phone = phone;
     }
     public String getName() {

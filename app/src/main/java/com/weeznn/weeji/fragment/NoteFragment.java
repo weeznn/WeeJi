@@ -1,5 +1,6 @@
 package com.weeznn.weeji.fragment;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,6 +11,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.weeznn.mylibrary.utils.Constant;
@@ -107,10 +110,20 @@ public class NoteFragment extends Fragment implements
         //fab
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(v.getContext(), MarkDownActivity.class);
-                intent.putExtra(MarkDownActivity.INTENT_FILE_TYPE, FileUtil.FILE_TYPE_NOTE);
-                startActivityForResult(intent,REQUEST_CODE_DIA);
+            public void onClick(final View v) {
+               AlertDialog.Builder builder=new AlertDialog.Builder(getContext());
+               final EditText editText=new EditText(getContext());
+               builder.setView(editText)
+                       .setTitle("笔记本名称")
+                       .setNeutralButton("新建", new DialogInterface.OnClickListener() {
+                           @Override
+                           public void onClick(DialogInterface dialog, int which) {
+                               Intent intent=new Intent(v.getContext(), MarkDownActivity.class);
+                               intent.putExtra(MarkDownActivity.INTENT_FILE_NAME,editText.getText().toString() );
+                               intent.putExtra(MarkDownActivity.INTENT_FILE_TYPE, FileUtil.FILE_TYPE_NOTE);
+                               startActivityForResult(intent,REQUEST_CODE_DIA);
+                           }
+                       }).show();
             }
         });
     }

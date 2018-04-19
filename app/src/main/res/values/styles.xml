@@ -47,4 +47,9 @@
         <item name="android:windowExitAnimation">@anim/popup_out_to_bottom</item>
     </style>
 
+    <style name="MyCheckBox" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="android:colorControlNormal">@color/colorGrey</item>
+        <item name="android:colorControlActivated">@color/colorPrimaryDark</item>
+    </style>
+
 </resources>

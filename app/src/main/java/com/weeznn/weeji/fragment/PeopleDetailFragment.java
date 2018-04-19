@@ -33,6 +33,7 @@ public class PeopleDetailFragment extends Fragment implements View.OnClickListen
     public static final String TAG = PeopleDetailFragment.class.getSimpleName();
     public static final String FLAG_BACK = "PeopleDetail";
     public static final String FLAG_ARG_PEOPLE_INFO = "info";
+    public static final String FLAG_ARG_PEOPLE_CODE = "code";
 
     public static final int FAB_EDIT = 1;
     public static final int FAB_DOWN = 2;
@@ -44,6 +45,8 @@ public class PeopleDetailFragment extends Fragment implements View.OnClickListen
     private String email;
     private String photo;
     private String company;
+    private long code;
+    private People people;
 
     private int fabState = FAB_EDIT;
     private boolean isSelf = true;//是不是本人的信息
@@ -66,6 +69,14 @@ public class PeopleDetailFragment extends Fragment implements View.OnClickListen
     private ImageView imageCall;
     private ImageView imageEmail;
 
+    public static PeopleDetailFragment newInstance(long code){
+        PeopleDetailFragment fragment=new PeopleDetailFragment();
+        Bundle bundle=new Bundle();
+        bundle.putLong(FLAG_ARG_PEOPLE_CODE,code);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,15 +93,26 @@ public class PeopleDetailFragment extends Fragment implements View.OnClickListen
         } else {
             isSelf = false;
             Bundle bundle = getArguments().getBundle(FLAG_ARG_PEOPLE_INFO);
-            name = bundle.getString(getString(R.string.pref_self_name));
-            photo = bundle.getString(getString(R.string.pref_self_photo));
-            job = bundle.getString(getString(R.string.pref_self_job));
-            company = bundle.getString(getString(R.string.pref_self_company));
-            number = bundle.getString(getString(R.string.pref_self_number));
-            email = bundle.getString(getString(R.string.pref_self_email));
+            code=bundle.getLong(FLAG_ARG_PEOPLE_CODE);
+            MyApplication.getInstant().runInTx(new Runnable() {
+                @Override
+                public void run() {
+                    people=MyApplication.getInstant().getPeopleDao().queryBuilder()
+                            .where(PeopleDao.Properties.Phone.eq(code))
+                            .list().get(0);
+
+                    name = people.getName();
+                    photo = people.getPhoto();
+                    job = people.getJob();
+                    company =people.getCompany();
+                    number = people.getPhone()+"";
+                    email = people.getEmail();
+                }
+            });
         }
 
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -172,7 +194,7 @@ public class PeopleDetailFragment extends Fragment implements View.OnClickListen
                     .putString(getString(R.string.pref_sim_self_json), json)
                     .apply();
         } else {
-            People people = new People(number, name, email, photo, company, job);
+            People people = new People(Long.getLong(number), name, email, photo, company, job);
             PeopleDao dao = MyApplication.getInstant().getPeopleDao();
             if (dao.queryBuilder().where(PeopleDao.Properties.Phone.eq(number)) == null) {
                 dao.insert(people);

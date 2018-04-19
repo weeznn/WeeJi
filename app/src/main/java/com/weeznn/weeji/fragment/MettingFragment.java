@@ -41,8 +41,8 @@ public class MettingFragment extends Fragment
         implements
         Constant,
         ItemClickListener {
-    private static final String TAG=MettingFragment.class.getSimpleName();
-    public static final String TAG_BACK="Metting";
+    private static final String TAG = MettingFragment.class.getSimpleName();
+    public static final String TAG_BACK = "Metting";
 
     //View
     private RecyclerView recyclerView;
@@ -53,10 +53,10 @@ public class MettingFragment extends Fragment
     private ActionBar actionBar;
 
     //逻辑
-    private List<Meeting> data=new ArrayList<>();
+    private List<Meeting> data = new ArrayList<>();
     private MettingAdapter mettingAdapter;
     private Fragment fragment;
-    private Handler handler=new Handler(new Handler.Callback() {
+    private Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
             refreshLayout.setRefreshing(false);
@@ -69,9 +69,9 @@ public class MettingFragment extends Fragment
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(TAG,"onCreat");
-        hasOptionsMenu();
-        fragment=this;
+        Log.i(TAG, "onCreat");
+        setHasOptionsMenu(true);
+        fragment = this;
 
     }
 
@@ -79,20 +79,20 @@ public class MettingFragment extends Fragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.i(TAG,"oncreatView");
-        View view=inflater.inflate(R.layout.fragment_metting, container, false);
-        recyclerView=view.findViewById(R.id.recyclerView);
-        refreshLayout=view.findViewById(R.id.freshLayout);
-        fab=view.findViewById(R.id.fab);
-        toolbar=view.findViewById(R.id.toolbar);
-        toolbarTitle=view.findViewById(R.id.text);
+        Log.i(TAG, "oncreatView");
+        View view = inflater.inflate(R.layout.fragment_metting, container, false);
+        recyclerView = view.findViewById(R.id.recyclerView);
+        refreshLayout = view.findViewById(R.id.freshLayout);
+        fab = view.findViewById(R.id.fab);
+        toolbar = view.findViewById(R.id.toolbar);
+        toolbarTitle = view.findViewById(R.id.text);
         return view;
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        Log.i(TAG,"onViewcreat");
+        Log.i(TAG, "onViewcreat");
         //freshlayout
         refreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorPrimaryDark));
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -105,11 +105,10 @@ public class MettingFragment extends Fragment
 
         //recyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mettingAdapter=new MettingAdapter(getContext(),data);
+        mettingAdapter = new MettingAdapter(getContext(), data);
         mettingAdapter.setItemClickListener(this);
         recyclerView.setAdapter(mettingAdapter);
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
-
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
 
 
         //fab
@@ -117,43 +116,43 @@ public class MettingFragment extends Fragment
             @Override
             public void onClick(View v) {
 
-                Fragment meetingPreEditfragment=new MeetingPreEditFragment();
-                Bundle bundle=new Bundle();
-                String self=getActivity().getSharedPreferences(getString(R.string.SharedPreferences_name),0)
-                        .getString(getString(R.string.pref_sim_self_json),getString(R.string.pref_self_def_sim_json));
-                bundle.putString(MeetingPreEditFragment.FLAG_PEOPLES,self);
+                Fragment meetingPreEditfragment = new MeetingPreEditFragment();
+                Bundle bundle = new Bundle();
+                String self = getActivity().getSharedPreferences(getString(R.string.SharedPreferences_name), 0)
+                        .getString(getString(R.string.pref_sim_self_json), getString(R.string.pref_self_def_sim_json));
+                bundle.putString(MeetingPreEditFragment.FLAG_PEOPLES, self);
                 meetingPreEditfragment.setArguments(bundle);
 
-                FragmentTransaction transaction=getActivity().getSupportFragmentManager().beginTransaction();
+                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
                 transaction.addToBackStack(MettingFragment.TAG_BACK)
                         .hide(fragment)
-                        .setCustomAnimations(R.animator.fragment_enter_from_bottom,R.animator.fragment_exit_to_left)
-                        .add(R.id.frameLayout,meetingPreEditfragment,MeetingPreEditFragment.TAG_BACK)
+                        .setCustomAnimations(R.animator.fragment_enter_from_bottom, R.animator.fragment_exit_to_left)
+                        .add(R.id.frameLayout, meetingPreEditfragment, MeetingPreEditFragment.TAG_BACK)
                         .commit();
             }
         });
 
         //toolbar
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        actionBar=((AppCompatActivity)getActivity()).getSupportActionBar();
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
         toolbarTitle.setText(R.string.nav_skill_meeting);
 
     }
 
-    private void updata(){
+    private void updata() {
         MyApplication.getInstant().runInTx(new Runnable() {
             @Override
             public void run() {
-                MeetingDao meetingDao=MyApplication.getInstant().getMeetingDao();
-                List<Meeting>list=meetingDao.queryBuilder()
+                MeetingDao meetingDao = MyApplication.getInstant().getMeetingDao();
+                List<Meeting> list = meetingDao.queryBuilder()
                         .limit(10)
                         .list();
-                Log.i(TAG,"DB query size:"+list.size());
+                Log.i(TAG, "DB query size:" + list.size());
                 data.addAll(list);
-                Log.i(TAG,"onRefresh data size ="+data.size());
+                Log.i(TAG, "onRefresh data size =" + data.size());
                 mettingAdapter.notifyDataSetChanged();
                 handler.sendMessage(new Message());
-                Log.i(TAG,"refreshLayout is refreshing "+refreshLayout.isRefreshing());
+                Log.i(TAG, "refreshLayout is refreshing " + refreshLayout.isRefreshing());
             }
         });
     }
@@ -164,7 +163,7 @@ public class MettingFragment extends Fragment
         //第一次添加数据
         data.clear();
         refreshLayout.setRefreshing(true);
-        while (refreshLayout.isRefreshing()){
+        while (refreshLayout.isRefreshing()) {
             updata();
             refreshLayout.setRefreshing(false);
         }
@@ -177,13 +176,14 @@ public class MettingFragment extends Fragment
 
     /**
      * 实现该接口，当item 被点击时跳转至DetailActivity；
+     *
      * @param position
      */
     @Override
     public void onItemClick(int position) {
-        Intent intent=new Intent(getActivity(), DetailActivity.class);
-        intent.putExtra(getString(R.string.LEFT_TYPE),CODE_MRT);
-        intent.putExtra(getString(R.string.LEFT_CODE),data.get(position).get_metID());
+        Intent intent = new Intent(getActivity(), DetailActivity.class);
+        intent.putExtra(getString(R.string.LEFT_TYPE), CODE_MRT);
+        intent.putExtra(getString(R.string.LEFT_CODE), data.get(position).get_metID());
         startActivity(intent);
     }
 

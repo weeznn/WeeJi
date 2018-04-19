@@ -15,7 +15,7 @@ import com.weeznn.weeji.util.db.entry.People;
 /** 
  * DAO for table "PEOPLE".
 */
-public class PeopleDao extends AbstractDao<People, Void> {
+public class PeopleDao extends AbstractDao<People, Long> {
 
     public static final String TABLENAME = "PEOPLE";
 
@@ -24,7 +24,7 @@ public class PeopleDao extends AbstractDao<People, Void> {
      * Can be used for QueryBuilder and for referencing column names.
      */
     public static class Properties {
-        public final static Property Phone = new Property(0, String.class, "phone", false, "PHONE");
+        public final static Property Phone = new Property(0, long.class, "phone", true, "_id");
         public final static Property Name = new Property(1, String.class, "name", false, "NAME");
         public final static Property Email = new Property(2, String.class, "email", false, "EMAIL");
         public final static Property Photo = new Property(3, String.class, "photo", false, "PHOTO");
@@ -45,7 +45,7 @@ public class PeopleDao extends AbstractDao<People, Void> {
     public static void createTable(Database db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"PEOPLE\" (" + //
-                "\"PHONE\" TEXT," + // 0: phone
+                "\"_id\" INTEGER PRIMARY KEY NOT NULL ," + // 0: phone
                 "\"NAME\" TEXT," + // 1: name
                 "\"EMAIL\" TEXT," + // 2: email
                 "\"PHOTO\" TEXT," + // 3: photo
@@ -62,11 +62,7 @@ public class PeopleDao extends AbstractDao<People, Void> {
     @Override
     protected final void bindValues(DatabaseStatement stmt, People entity) {
         stmt.clearBindings();
- 
-        String phone = entity.getPhone();
-        if (phone != null) {
-            stmt.bindString(1, phone);
-        }
+        stmt.bindLong(1, entity.getPhone());
  
         String name = entity.getName();
         if (name != null) {
@@ -97,11 +93,7 @@ public class PeopleDao extends AbstractDao<People, Void> {
     @Override
     protected final void bindValues(SQLiteStatement stmt, People entity) {
         stmt.clearBindings();
- 
-        String phone = entity.getPhone();
-        if (phone != null) {
-            stmt.bindString(1, phone);
-        }
+        stmt.bindLong(1, entity.getPhone());
  
         String name = entity.getName();
         if (name != null) {
@@ -130,14 +122,14 @@ public class PeopleDao extends AbstractDao<People, Void> {
     }
 
     @Override
-    public Void readKey(Cursor cursor, int offset) {
-        return null;
+    public Long readKey(Cursor cursor, int offset) {
+        return cursor.getLong(offset + 0);
     }    
 
     @Override
     public People readEntity(Cursor cursor, int offset) {
         People entity = new People( //
-            cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // phone
+            cursor.getLong(offset + 0), // phone
             cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
             cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // email
             cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // photo
@@ -149,7 +141,7 @@ public class PeopleDao extends AbstractDao<People, Void> {
      
     @Override
     public void readEntity(Cursor cursor, People entity, int offset) {
-        entity.setPhone(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
+        entity.setPhone(cursor.getLong(offset + 0));
         entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
         entity.setEmail(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
         entity.setPhoto(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
@@ -158,20 +150,23 @@ public class PeopleDao extends AbstractDao<People, Void> {
      }
     
     @Override
-    protected final Void updateKeyAfterInsert(People entity, long rowId) {
-        // Unsupported or missing PK type
-        return null;
+    protected final Long updateKeyAfterInsert(People entity, long rowId) {
+        entity.setPhone(rowId);
+        return rowId;
     }
     
     @Override
-    public Void getKey(People entity) {
-        return null;
+    public Long getKey(People entity) {
+        if(entity != null) {
+            return entity.getPhone();
+        } else {
+            return null;
+        }
     }
 
     @Override
     public boolean hasKey(People entity) {
-        // TODO
-        return false;
+        throw new UnsupportedOperationException("Unsupported for entities with a non-null key");
     }
 
     @Override

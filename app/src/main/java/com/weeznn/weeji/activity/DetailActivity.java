@@ -140,7 +140,8 @@ public class DetailActivity extends AppCompatActivity implements
                 imageView.setBackground(getResources().getDrawable(R.drawable.ic_meeting));
                 break;
             case CODE_PEO:
-                fragment= new PeopleDetailFragment();
+               fragment=new PeopleDetailFragment().newInstance(code);
+               imageView.setBackground(getResources().getDrawable(R.drawable.ic_user_black));
                 break;
         }
         fragmentManager.beginTransaction().add(R.id.frameLayout, fragment).commit();

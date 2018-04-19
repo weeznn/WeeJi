@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,6 +19,8 @@ import com.weeznn.weeji.R;
 import com.weeznn.weeji.interfaces.ItemClickListener;
 import com.weeznn.weeji.util.SimplePeople;
 import com.weeznn.weeji.util.db.entry.People;
+
+import org.w3c.dom.ls.LSException;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -33,14 +36,15 @@ public class PeopleListSeleteAdapter extends RecyclerView.Adapter<PeopleListSele
     private List<People> data;
     private List<SimplePeople> simplePeopleList;
     private LayoutInflater inflater;
-    private ItemClickListener listener;
+    PeopleListChangeInterface listener;
 
-    public void setItemClickListener(ItemClickListener listener) {
+
+    public void setPeopleListChangeListener(PeopleListChangeInterface listener) {
         this.listener = listener;
     }
 
     public PeopleListSeleteAdapter(Context context, List<People> peopleList, List<SimplePeople> simplePeople) {
-        Log.i(TAG, "PeopleListSeleteAdapter  people List Size : " + peopleList.size() + "   simple people list size " + simplePeople.size());
+        Log.i(TAG,"PeopleListSeleteAdapter  list size:"+peopleList.size()+"  simplePeople size "+simplePeople.size());
         this.data = peopleList;
         this.inflater = LayoutInflater.from(context);
         this.simplePeopleList = simplePeople;
@@ -48,16 +52,14 @@ public class PeopleListSeleteAdapter extends RecyclerView.Adapter<PeopleListSele
 
     @Override
     public PeopleSeleteViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Log.i(TAG, "onCreateViewHolder");
         View view = inflater.inflate(R.layout.item_people_list_select, parent, false);
         return new PeopleSeleteViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(PeopleSeleteViewHolder holder, int position) {
+    public void onBindViewHolder(final PeopleSeleteViewHolder holder, final int position) {
         final People people = data.get(position);
 
-        Log.i(TAG, "bindSeleteViewHolder");
         RequestOptions options = new RequestOptions();
         options.circleCrop()
                 .error(R.drawable.ic_user_black)
@@ -67,16 +69,22 @@ public class PeopleListSeleteAdapter extends RecyclerView.Adapter<PeopleListSele
                 .apply(options)
                 .into(holder.imageView);
 
-        holder.chrck.setOnClickListener(new View.OnClickListener() {
+        SimplePeople simplePeople=new SimplePeople(people.getName(),people.getPhoto(),people.getJob(),people.getCompany());
+        if (simplePeopleList.contains(simplePeople)){
+            holder.chrck.setChecked(true);
+        }
 
-            @SuppressLint("RestrictedApi")
+        holder.chrck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                CheckBox view1 = v.findViewById(R.id.check);
-                cllick(view1.isChecked(), people);
-                view1.setChecked(!view1.isChecked());
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked){
+                    listener.add(position);
+                }else {
+                    listener.remove(position);
+                }
             }
         });
+
 
         holder.name.setText(people.getName());
         holder.job.setText(people.getJob());
@@ -86,27 +94,20 @@ public class PeopleListSeleteAdapter extends RecyclerView.Adapter<PeopleListSele
             @Override
             public void onClick(View v) {
                 CheckBox view1 = v.findViewById(R.id.check);
-                cllick(view1.isChecked(), people);
-                view1.setChecked(!view1.isChecked());
+                if (view1.isChecked()){
+                    view1.setChecked(false);
+                    listener.remove(position);
+                }else {
+                    view1.setChecked(true);
+                    listener.add(position);
+                }
             }
         });
     }
 
-    private void cllick(boolean b, People people) {
-        if (b) {
-            Log.i(TAG, "被选中，添加");
-            //添加到simpledata中
-            simplePeopleList.add(new SimplePeople(people.getName(), people.getPhoto(), people.getJob(), people.getCompany()));
-        } else {
-            Log.i(TAG, "被删除");
-            //删除simpledata中
-            simplePeopleList.remove(new SimplePeople(people.getName(), people.getPhoto(), people.getJob(), people.getCompany()));
-        }
-    }
 
     @Override
     public int getItemCount() {
-        Log.i(TAG, "getItemCount" + data.size());
         return data.size();
     }
 
@@ -128,5 +129,10 @@ public class PeopleListSeleteAdapter extends RecyclerView.Adapter<PeopleListSele
             layout = itemView.findViewById(R.id.layout);
             chrck = itemView.findViewById(R.id.check);
         }
+    }
+
+    public interface PeopleListChangeInterface{
+        void add(int position);
+        void remove(int position);
     }
 }

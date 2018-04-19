@@ -2,12 +2,15 @@ package com.weeznn.weeji.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -32,6 +35,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.weeznn.mylibrary.utils.Constant;
 import com.weeznn.mylibrary.utils.FileUtil;
 import com.weeznn.weeji.MyApplication;
 import com.weeznn.weeji.R;
@@ -39,13 +43,16 @@ import com.weeznn.weeji.activity.DetailActivity;
 import com.weeznn.weeji.activity.MarkDownActivity;
 import com.weeznn.weeji.interfaces.UpdataFragmentDetailListener;
 import com.weeznn.weeji.service.AudioIntentService;
+import com.weeznn.weeji.service.AudioService;
 import com.weeznn.weeji.util.db.MeetingDao;
 import com.weeznn.weeji.util.db.entry.Meeting;
 
 import java.lang.reflect.Method;
 import java.util.List;
 
-public class MeetingDetailFragment extends Fragment{
+import static android.app.Activity.RESULT_OK;
+
+public class MeetingDetailFragment extends Fragment implements Constant{
     private static final String TAG = "MeetingDetailFragment";
 
     private static final String ARG_PARAM1 = "CODE";
@@ -112,6 +119,7 @@ public class MeetingDetailFragment extends Fragment{
             code = getArguments().getLong(ARG_PARAM1);
             initInfo();
         }
+        //广播接收器
         localBroadcastManager = LocalBroadcastManager.getInstance(getContext());
         IntentFilter filter = new IntentFilter();
         filter.addAction(AudioIntentService.ACTION_AUDIO_PRO);
@@ -166,24 +174,26 @@ public class MeetingDetailFragment extends Fragment{
         });
     }
 
+    private AudioService.MyBinder myBinder;
     private void handleMenuItemClick(MenuItem item) {
         switch (item.getItemId()){
             case R.id.btn_player:
-                if (playerState == PLAYER_PAUSE) {
+                if (playerState == PLAYER_PAUSE &&myBinder==null) {
                     Log.i(TAG, "开始播放");
                     playerState = PLAYER_START;
-                    int i=AudioIntentService.ActionStart(getContext(),meeting.getTitle(),FileUtil.FILE_TYPE_MEETING);
-                    if (i!=AudioIntentService.RESULT_CODE_SUC){
-                        item.setVisible(false);
-                        Snackbar snackbar=Snackbar.make(textView,"音频无法播放",Snackbar.LENGTH_SHORT);
-                        snackbar.getView().setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
-                        snackbar.show();
-                    }
+
+                    Intent intent=new Intent(getContext(), AudioService.class);
+                    getActivity().bindService(intent,serviceConnection,Context.BIND_AUTO_CREATE);
                     item.setIcon(R.drawable.ic_pause_black_24dp);
-                } else {
-                    Log.i(TAG, "暂停播放");
+                } else if (playerState == PLAYER_PAUSE&&myBinder!=null){
+                    playerState = PLAYER_START;
+                    Log.i(TAG, "继续播放");
+                    myBinder.start();
+                    item.setIcon(R.drawable.ic_pause_black_24dp);
+                }else if (playerState == PLAYER_START&&myBinder!=null){
                     playerState = PLAYER_PAUSE;
-                    AudioIntentService.ActionPause(getContext());
+                    Log.i(TAG, "暂停播放");
+                    myBinder.pause();
                     item.setIcon(R.drawable.ic_play_arrow_black_24dp);
                 }
                 break;
@@ -192,7 +202,7 @@ public class MeetingDetailFragment extends Fragment{
                 intent.putExtra(MarkDownActivity.INTENT_FILE_NAME,title);
                 intent.putExtra(MarkDownActivity.INTENT_FILE_TYPE,FileUtil.FILE_TYPE_MEETING);
                 intent.putExtra(MarkDownActivity.INTENT_FILE_DATA,txt);
-                startActivity(intent);
+                startActivityForResult(intent,REQUEST_CODE_MET_EDIT);
                 break;
         }
     }
@@ -221,7 +231,6 @@ public class MeetingDetailFragment extends Fragment{
         super.onDetach();
         mListener = null;
         localBroadcastManager.unregisterReceiver(resiver);
-        AudioIntentService.ActionStop(getContext());
     }
 
     public interface OnFragmentInteractionListener {
@@ -322,4 +331,29 @@ public class MeetingDetailFragment extends Fragment{
             progressBar.setProgress(intent.getIntExtra(AudioIntentService.AUDIO_PROGRESS, 0));
         }
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode==RESULT_OK){
+            Snackbar.make(textView,"MarkDown文件已保存到本地！",Snackbar.LENGTH_SHORT)
+                    .show();
+        }
+    }
+
+    private ServiceConnection serviceConnection=new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            myBinder=((AudioService.MyBinder)service);
+            myBinder.prepare(getContext(),meeting.getTitle(),FileUtil.FILE_TYPE_MEETING);
+            myBinder.start();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            Snackbar snackbar = Snackbar.make(textView, "音频无法播放", Snackbar.LENGTH_SHORT);
+            snackbar.getView().setBackgroundColor(getResources().getColor(R.color.colorPrimaryDark));
+            snackbar.show();
+        }
+    };
 }

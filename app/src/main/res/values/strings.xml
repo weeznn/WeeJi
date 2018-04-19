@@ -182,7 +182,7 @@
 
     <string name="TABLE_NOT_noteID">_noteID</string>
     <string name="TABLE_NOT_time">time</string>
-    <string name="TABLE_NOT_cache">image</string>
+    <string name="TABLE_NOT_image">image</string>
     <string name="TABLE_NOT_sub">sub</string>
     <string name="TABLE_NOT_source">source</string>
     <!--Table PEO-->
